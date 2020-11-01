@@ -1,0 +1,45 @@
+%evalIO
+
+(λ pure print getch bind succ zero fst snd pair.
+    (λ p0 sp.
+        (λ pred .
+            bind getch (λn. print (pred n))
+        )
+        ( # pred
+            λn f x. n (λg h. h (g f)) (λu. x) (λu. u)
+        )
+    )
+    ( # p0
+        pair zero zero
+    )
+    ( # sp = λ(a, b). (b, b + 1)
+        λp. pair (snd p) (succ (snd p))
+    )
+)
+( # pure
+    λ k pure _ _ _ . pure k
+)
+( # print
+    λ k _ print _ _ . print k
+)
+( # getch
+    λ _ _ get_ch _ . get_ch
+)
+( # bind
+    λ a b _ _ _ bind . bind a b
+)
+( # succ
+    λn f x. n f (f x)
+)
+( # zero
+    λf x. x
+)
+( # fst
+    λp. p (λx y. x)
+)
+( # snd
+    λp. p (λx y. y)
+)
+( # pair
+    λa b. λf. f a b
+)
