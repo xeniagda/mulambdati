@@ -1,4 +1,5 @@
 from expr import *
+from monad_io import CONSOLE_EIO
 
 class NoParse(Exception):
     def __init__(self, msg, len_left):
@@ -171,7 +172,7 @@ def parse_evalio(inp):
 
     term, inp = parse_term(inp)
 
-    return EvalIO(term), inp
+    return CONSOLE_EIO(term), inp
 
 def parse_term_small(inp):
     return mparse_any(
