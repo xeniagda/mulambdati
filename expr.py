@@ -225,10 +225,10 @@ def multi_lambda(*args):
 class Symbol(LambdaTerm): # %evalIO a b
     def __init__(self, symbol):
         super(Symbol, self).__init__()
-        self.symbol = symbol
+        self.name = symbol
 
     def stringify(self, mode, prec):
-        return "'" + self.symbol
+        return "'" + self.name
 
     def free_variables(self):
         return set()
@@ -244,7 +244,7 @@ class Symbol(LambdaTerm): # %evalIO a b
 
     def __eq__(self, other):
         if isinstance(other, Symbol):
-            return other.symbol == self.symbol
+            return other.name == self.name
         return False
 
 def make_chnum_term(n):
