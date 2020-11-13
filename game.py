@@ -26,8 +26,8 @@ class Game:
 
 if __name__ == "__main__":
     import sys
-    tty1, tty2 = sys.argv[1], sys.argv[2]
-    with open(tty1, "r") as it1, open(tty1, "w") as ot1, open(tty2, "r") as it2, open(tty2, "w") as ot2:
+    tty1i, tty1o, tty2i, tty2o = sys.argv[1:5]
+    with open(tty1i, "r") as it1, open(tty1o, "w") as ot1, open(tty2i, "r") as it2, open(tty2o, "w") as ot2:
         ot1.write("=== RESTART ===\n"); ot1.flush()
         ot2.write("=== RESTART ===\n"); ot2.flush()
 
