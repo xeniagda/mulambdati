@@ -228,7 +228,10 @@ class Symbol(LambdaTerm): # %evalIO a b
         self.name = symbol
 
     def stringify(self, mode, prec):
-        return "'" + str(self.name)
+        if isinstance(self.name, str):
+            return "'" + self.name
+        else:
+            return type(self.name).__name__ + "'" + str(self.name)
 
     def free_variables(self):
         return set()
