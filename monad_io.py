@@ -1,4 +1,4 @@
-from expr import LambdaTerm, Abstraction, Application, Symbol, make_chnum
+from expr import LambdaTerm, Abstraction, Application, Symbol, Variable, make_chnum
 
 class MonadIOAction:
     def __init__(self, name, arg_names, run):
