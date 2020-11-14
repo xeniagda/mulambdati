@@ -3,19 +3,19 @@ from monad_io import EvalIO
 from abc import ABC, abstractmethod
 
 class Action:
-    def __init__(self, purchases, deck_combine, eval_terms):
-        self.purchases = purchases
+    def __init__(self, combinator_purchases, deck_combine, eval_terms):
+        self.combinator_purchases = combinator_purchases
         self.deck_combine = deck_combine
         self.eval_terms = eval_terms
 
     def __str__(self):
-        return f"Action(purchases={self.purchases}, deck_combine={self.deck_combine}, eval_terms={self.eval_terms})"
+        return f"Action(combinator_purchases={self.combinator_purchases}, deck_combine={self.deck_combine}, eval_terms={self.eval_terms})"
 
     def run(self, game):
         player = game.players[game.turn]
 
         player.mana += 1
-        for p in self.purchases:
+        for p in self.combinator_purchases:
             price, _name, term = game.combinators[p]
             player.mana -= price
             player.deck.append(term)
