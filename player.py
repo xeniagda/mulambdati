@@ -26,8 +26,7 @@ class Action:
 
         for e in self.eval_terms:
             term = EvalIO(game.layout, player.deck[e])
-            del player.deck[e]
-            term.whnf()
+            player.deck[e] = term.whnf()
 
 class Player(ABC):
     def __init__(self, health, mana):
