@@ -1,4 +1,4 @@
-from expr import LambdaTerm, Abstraction, Application, Symbol, make_chnum
+from expr import LambdaTerm, Abstraction, Application, Symbol, Variable, make_chnum
 from monad_io import MonadIOAction, MonadIOLayout
 from player import ConsolePlayer
 
@@ -36,23 +36,36 @@ if __name__ == "__main__":
 
         # Combinators:
         #   give_mana: +10 mana
-        #   give_health: +10 health
         #   do_damage x: perform x damage
+        #   get_opponent_health
+        #   receive_expr: λx. you get the card x.
         #   sym_10: the number 10
         #   sym_2: the number 2
 
         def make_layout(game):
+            Identity = Abstraction("x", Variable("x"))
+
             def give_mana():
                 print(f"Player {game.turn} gained 10 mana!")
                 game.players[game.turn].mana += 10
+                return Identity
+
             action_give_mana = MonadIOAction("give_10_mana", [], give_mana)
 
             def do_damage(x):
                 print(f"Player {game.turn} dealt {x.name} damage!")
                 game.players[~game.turn].health -= x.name
+                return Identity
+
             action_do_damage = MonadIOAction("do_damage", ['x'], do_damage)
 
-            layout = MonadIOLayout([action_give_mana, action_do_damage])
+            def get_opponent_health():
+                print(f"Player {game.turn} gets opponents health!")
+                return Symbol(game.players[~game.turn].health)
+
+            action_goh = MonadIOAction("get_opponent_health", [], get_opponent_health)
+
+            layout = MonadIOLayout([action_give_mana, action_do_damage, action_goh])
             return layout
 
         game = Game(
@@ -62,6 +75,8 @@ if __name__ == "__main__":
 
         game.add_combinator(5, "+10 mana", game.layout.constructor_for_idx(0))
         game.add_combinator(10, "λx. do x damage", game.layout.constructor_for_idx(1))
+        game.add_combinator(10, "get opponent's health", game.layout.constructor_for_idx(2))
+        game.add_combinator(1, "bind", game.layout.constructor_for_idx(3))
         game.add_combinator(2, "the number 2", Symbol(2))
         game.add_combinator(7, "the number 7", Symbol(7))
 
