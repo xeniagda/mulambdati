@@ -39,6 +39,7 @@ class Action:
 
         for e in self.eval_terms:
             term = EvalIO(game.layout, player.deck[e])
+            print("Player {game.turn} running {term}")
             player.deck[e] = term.whnf()
 
 class Player(ABC):
