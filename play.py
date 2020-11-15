@@ -25,6 +25,11 @@ with open(tty1i, "r") as it1, open(tty1o, "w") as ot1, open(tty2i, "r") as it2, 
     def make_layout(game):
         Identity = Abstraction("x", Variable("x"))
 
+        def pure(x):
+            return x
+
+        action_pure = MonadIOAction("pure", ['x'], pure)
+
         def give_mana():
             print(f"Player {game.turn} gained 10 mana!")
             game.players[game.turn].mana += 10
@@ -45,7 +50,7 @@ with open(tty1i, "r") as it1, open(tty1o, "w") as ot1, open(tty2i, "r") as it2, 
 
         action_goh = MonadIOAction("get_opponent_health", [], get_opponent_health)
 
-        layout = MonadIOLayout([action_give_mana, action_do_damage, action_goh])
+        layout = MonadIOLayout([action_pure, action_give_mana, action_do_damage, action_goh])
         return layout
 
     game = Game(
@@ -53,10 +58,11 @@ with open(tty1i, "r") as it1, open(tty1o, "w") as ot1, open(tty2i, "r") as it2, 
         make_layout,
     )
 
-    game.add_combinator(5, "+10 mana", game.layout.constructor_for_idx(0))
-    game.add_combinator(10, "λx. do x damage", game.layout.constructor_for_idx(1))
-    game.add_combinator(10, "get opponent's health", game.layout.constructor_for_idx(2))
-    game.add_combinator(1, "bind", game.layout.constructor_for_idx(3))
+    game.add_combinator(1, "pure", game.layout.constructor_for_idx(0))
+    game.add_combinator(5, "+10 mana", game.layout.constructor_for_idx(1))
+    game.add_combinator(10, "λx. do x damage", game.layout.constructor_for_idx(2))
+    game.add_combinator(10, "get opponent's health", game.layout.constructor_for_idx(3))
+    game.add_combinator(1, "bind", game.layout.constructor_for_idx(4))
     game.add_combinator(2, "the number 2", Symbol(2))
     game.add_combinator(7, "the number 7", Symbol(7))
 
