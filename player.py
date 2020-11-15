@@ -76,7 +76,9 @@ class ConsolePlayer(Player):
                 tag = " (you!)"
             self.f_out.write(f"{name}{tag}:\n")
             self.f_out.write(f"    Health/Mana: {pl.health}/{pl.mana}\n")
-            self.f_out.write(f"    Deck: {pl.deck}\n")
+            self.f_out.write("    Deck:\n")
+            for i, card in enumerate(pl.deck):
+                self.f_out.write(f"        {i}: {card}\n")
 
         self.f_out.flush()
 
