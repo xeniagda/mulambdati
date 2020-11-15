@@ -1,4 +1,4 @@
-from expr import LambdaTerm, Abstraction, Application, Symbol, Variable, make_chnum
+from expr import LambdaTerm, Abstraction, Application, Symbol, Variable, Opaque, make_chnum
 
 class MonadIOAction:
     def __init__(self, name, arg_names, run):
@@ -61,6 +61,8 @@ class MonadIOLayout:
         for arg in action.arg_names[::-1]:
             result = Abstraction(arg, result)
 
+        result = Opaque(action.symb.name, result)
+
         return result
 
 class EvalIO(LambdaTerm): # %evalIO a b
@@ -86,8 +88,8 @@ class EvalIO(LambdaTerm): # %evalIO a b
     def beta_reduce(self):
         return EvalIO(self.term.beta_reduce_once())
 
-    def whnf(self):
-        monad_res = self.layout.apply_monad(self.term).whnf()
+    def whnf(self, _force_opaques=False):
+        monad_res = self.layout.apply_monad(self.term).whnf(force_opaques=True)
 
         matched = self.layout.match_monad_result(monad_res)
         if matched is None:

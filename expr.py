@@ -34,6 +34,9 @@ class StringifyMode:
     def prefix_sign(self):
         return "`"
 
+    def expand_opaques(self):
+        return False
+
 # Precedence:
 #   λa. b = 1
 #   a b = 0
@@ -59,7 +62,7 @@ class LambdaTerm(ABC):
         pass
 
     @abstractmethod
-    def whnf(self):
+    def whnf(self, force_opaques=False):
         pass
 
     @abstractmethod
@@ -122,7 +125,7 @@ class Abstraction(LambdaTerm): # λv. t
     def beta_reduce(self):
         return Abstraction(self.variable, self.term.beta_reduce())
 
-    def whnf(self):
+    def whnf(self, force_opaques=False):
         return self
 
 class Variable(LambdaTerm): # v
@@ -150,7 +153,7 @@ class Variable(LambdaTerm): # v
     def beta_reduce(self):
         return self
 
-    def whnf(self):
+    def whnf(self, force_opaques=False):
         return self
 
 class Application(LambdaTerm): # t1 t2
@@ -200,11 +203,11 @@ class Application(LambdaTerm): # t1 t2
 
         return Application(caller, callee)
 
-    def whnf(self):
-        caller = self.caller.whnf()
+    def whnf(self, force_opaques=False):
+        caller = self.caller.whnf(force_opaques)
 
         if isinstance(caller, Abstraction):
-            return caller.term.replace(caller.variable, self.callee).whnf()
+            return caller.term.replace(caller.variable, self.callee).whnf(force_opaques)
 
         return Application(caller, self.callee)
 
@@ -242,12 +245,49 @@ class Symbol(LambdaTerm): # %evalIO a b
     def beta_reduce(self):
         return self
 
-    def whnf(self):
+    def whnf(self, force_opaques=False):
         return self
 
     def __eq__(self, other):
         if isinstance(other, Symbol):
             return other.name == self.name
+        return False
+
+class Opaque(LambdaTerm):
+    def __init__(self, name, term):
+        super(Opaque, self).__init__()
+        self.name = name
+        self.term = term
+
+    def stringify(self, mode, prec):
+        if mode.expand_opaques():
+            return self.term.stringify(mode, prec)
+        return f"#{self.name}"
+
+    def free_variables(self):
+        return self.term.free_variables()
+
+    def replace(self, name, term):
+        after = self.term.replace(name, term)
+        if self.term == after:
+            return self
+        return after
+
+    def beta_reduce(self):
+        after = self.term.beta_reduce()
+        if self.term == after:
+            return self
+        return after
+
+    def whnf(self, force_opaques=False):
+        after = self.term.whnf()
+        if self.term == after and not force_opaques:
+            return self
+        return after
+
+    def __eq__(self, other):
+        if isinstance(other, Opaque):
+            return other.name == self.name and self.term == other.term
         return False
 
 def make_chnum_term(n):
