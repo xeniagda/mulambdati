@@ -76,7 +76,8 @@ class MonadIOLayout:
             "actions": [action.to_json_obj() for action in self.actions],
         }
 
-def eval_monad_io(layout, term):
+# kwargs are passed into the inner action functions
+def eval_monad_io(layout, term, **kwargs):
     monad_res = layout.apply_monad(term).whnf(force_opaques=True)
 
     matched = layout.match_monad_result(monad_res)
@@ -91,7 +92,7 @@ def eval_monad_io(layout, term):
             x_applied = Application(args[1], y_res)
             return eval_monad_io(layout, x_applied).whnf()
 
-        res = action.run(*args)
+        res = action.run(*args, **kwargs)
         return res
 
 def _make_standard_io_layout():
