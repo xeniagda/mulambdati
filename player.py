@@ -43,7 +43,8 @@ class Action:
             player.deck[e] = term.whnf()
 
 class Player(ABC):
-    def __init__(self, health, mana):
+    def __init__(self, sec_token, health, mana):
+        self.sec_token = sec_token # Given to a client on game start, kept secret and used to """authenticate"""
         self.health = health
         self.mana = mana
         self.deck = []
@@ -61,8 +62,8 @@ class Player(ABC):
         pass
 
 class ConsolePlayer(Player):
-    def __init__(self, health, mana, f_in, f_out):
-        super(ConsolePlayer, self).__init__(health, mana)
+    def __init__(self, sec_token, health, mana, f_in, f_out):
+        super(ConsolePlayer, self).__init__(sec_token, health, mana)
 
         self.f_out = f_out
         self.f_in = f_in

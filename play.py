@@ -11,8 +11,8 @@ with open(tty1i, "r") as it1, open(tty1o, "w") as ot1, open(tty2i, "r") as it2, 
     ot1.write("=== RESTART ===\n"); ot1.flush()
     ot2.write("=== RESTART ===\n"); ot2.flush()
 
-    pl1 = ConsolePlayer(10, 0, it1, ot1)
-    pl2 = ConsolePlayer(10, 0, it2, ot2)
+    pl1 = ConsolePlayer("hhhH", 10, 0, it1, ot1)
+    pl2 = ConsolePlayer("hhhH", 10, 0, it2, ot2)
 
     # Combinators:
     #   give_mana: +10 mana
