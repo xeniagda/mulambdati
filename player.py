@@ -69,7 +69,7 @@ class Player(ABC):
             "deck": [term.to_json_obj() for term in self.deck],
         }
 
-class ExternalPlayer(ABC):
+class ExternalPlayer(Player):
     def __init__(self, sec_token, health, mana):
         super(ExternalPlayer, self).__init__(sec_token, health, mana)
 
