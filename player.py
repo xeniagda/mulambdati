@@ -70,8 +70,12 @@ class ConsolePlayer(Player):
         self.f_in = f_in
 
         self.purchasable_combinators = []
+        self.surpress_state = False
 
     async def update_state(self, game):
+        if self.surpress_state:
+            return
+
         self.purchasable_combinators = game.combinators
         for pl, name in [(game.players[0], "Player one"), (game.players[1], "Player two")]:
             tag = ""
@@ -90,6 +94,11 @@ class ConsolePlayer(Player):
         await self.f_out.flush()
 
     async def get_action(self):
+        await self.f_out.write("Press enter to start action!\n")
+        await self.f_in.readline()
+
+        self.surpress_state = True
+
         await self.f_out.write("Your turn!\n")
         await self.f_out.write("Combinators:\n")
         for i, (price, name, term) in enumerate(self.purchasable_combinators):
@@ -118,4 +127,5 @@ class ConsolePlayer(Player):
         await self.f_out.flush()
         evals = [int(x) for x in (await self.f_in.readline()).strip().split(",") if x]
 
+        self.surpress_state = False
         return Action(combinators, fvs, abstractions, combines, evals)
