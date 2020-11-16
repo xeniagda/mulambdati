@@ -1,6 +1,7 @@
 from expr import Application, Variable, Abstraction
 from monad_io import EvalIO
 from abc import ABC, abstractmethod
+import asyncio
 
 class Action:
     def __init__(self, combinators, fvs, abstractions, deck_combine, eval_terms):
@@ -16,8 +17,8 @@ class Action:
             "fvs={self.fvs}, abstractions={self.abstractions}, " +\
             "deck_combine={self.deck_combine}, eval_terms={self.eval_terms})"
 
-    def run(self, game):
-        player = game.players[game.turn]
+    def run(self, game, player_idx):
+        player = game.players[player_idx]
 
         player.mana += 1
         for p in self.combinators:
@@ -39,7 +40,7 @@ class Action:
 
         for e in self.eval_terms:
             term = EvalIO(game.layout, player.deck[e])
-            print("Player {game.turn} running {term}")
+            print("Player {player_idx} running {term}")
             player.deck[e] = term.whnf()
 
 class Player(ABC):
@@ -76,45 +77,45 @@ class ConsolePlayer(Player):
             tag = ""
             if pl is self:
                 tag = " (you!)"
-            self.f_out.write(f"{name}{tag}:\n")
-            self.f_out.write(f"    Health/Mana: {pl.health}/{pl.mana}\n")
-            self.f_out.write("    Deck:\n")
+            await self.f_out.write(f"{name}{tag}:\n")
+            await self.f_out.write(f"    Health/Mana: {pl.health}/{pl.mana}\n")
+            await self.f_out.write("    Deck:\n")
             for i, card in enumerate(pl.deck):
-                self.f_out.write(f"        {i}: {card}\n")
+                await self.f_out.write(f"        {i}: {card}\n")
 
-        self.f_out.flush()
+        await self.f_out.flush()
 
     async def tell_action(self, action):
-        self.f_out.write(f"[!! {action} !!]\n")
-        self.f_out.flush()
+        await self.f_out.write(f"[!! {action} !!]\n")
+        await self.f_out.flush()
 
     async def get_action(self):
-        self.f_out.write("Your turn!\n")
-        self.f_out.write("Combinators:\n")
+        await self.f_out.write("Your turn!\n")
+        await self.f_out.write("Combinators:\n")
         for i, (price, name, term) in enumerate(self.purchasable_combinators):
-            self.f_out.write(f"    {i}: {name}: costs {price}𐌼\n")
+            await self.f_out.write(f"    {i}: {name}: costs {price}𐌼\n")
 
-        self.f_out.write("Purchase combinators? (comb),* ")
-        self.f_out.flush()
+        await self.f_out.write("Purchase combinators? (comb),* ")
+        await self.f_out.flush()
 
-        combinators = [int(x) for x in self.f_in.readline().strip().split(",") if x]
+        combinators = [int(x) for x in (await self.f_in.readline()).strip().split(",") if x]
 
-        self.f_out.write("Purchase free variables (2𐌼 per variable) (name),*? ")
-        self.f_out.flush()
+        await self.f_out.write("Purchase free variables (2𐌼 per variable) (name),*? ")
+        await self.f_out.flush()
 
-        fvs = [x for x in self.f_in.readline().strip().split(",") if x]
+        fvs = [x for x in (await self.f_in.readline()).strip().split(",") if x]
 
-        self.f_out.write("Abstractions (2𐌼)  (enter (row-name2caputre)-*),* ")
-        self.f_out.flush()
+        await self.f_out.write("Abstractions (2𐌼)  (enter (row-name2caputre)-*),* ")
+        await self.f_out.flush()
 
-        abstractions = [(int(x.split("-")[0]), x.split("-")[1]) for x in self.f_in.readline().strip().split(",") if x]
+        abstractions = [(int(x.split("-")[0]), x.split("-")[1]) for x in (await self.f_in.readline()).strip().split(",") if x]
 
-        self.f_out.write("Combines (f-x),* ")
-        self.f_out.flush()
-        combines = [(int(y) for y in x.split("-")) for x in self.f_in.readline().strip().split(",") if x]
+        await self.f_out.write("Combines (f-x),* ")
+        await self.f_out.flush()
+        combines = [(int(y) for y in x.split("-")) for x in (await self.f_in.readline()).strip().split(",") if x]
 
-        self.f_out.write("Evals (f),* ")
-        self.f_out.flush()
-        evals = [int(x) for x in self.f_in.readline().strip().split(",") if x]
+        await self.f_out.write("Evals (f),* ")
+        await self.f_out.flush()
+        evals = [int(x) for x in (await self.f_in.readline()).strip().split(",") if x]
 
         return Action(combinators, fvs, abstractions, combines, evals)
