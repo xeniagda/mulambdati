@@ -1,47 +1,6 @@
-from expr import Application, Variable, Abstraction
-from monad_io import EvalIO
 from abc import ABC, abstractmethod
+from action import *
 import asyncio
-
-class Action:
-    def __init__(self, combinators, fvs, abstractions, deck_combine, eval_terms):
-        self.combinators = combinators
-        self.fvs = fvs # [str]
-        self.abstractions = abstractions # [(int, str)]
-        self.deck_combine = deck_combine
-        self.eval_terms = eval_terms
-
-    def __str__(self):
-        return\
-            f"Action(combinators={self.combinators}, " +\
-            "fvs={self.fvs}, abstractions={self.abstractions}, " +\
-            "deck_combine={self.deck_combine}, eval_terms={self.eval_terms})"
-
-    def run(self, game, player_idx):
-        player = game.players[player_idx]
-
-        player.mana += 1
-        for p in self.combinators:
-            comb = game.combinators[p]
-            player.mana -= comb.price
-            player.deck.append(comb.term)
-
-        for fv in self.fvs:
-            player.deck.append(Variable(fv))
-            player.mana -= 2
-
-        for row, name in self.abstractions:
-            player.deck[row] = Abstraction(name, player.deck[row])
-            player.mana -= 2
-
-        for (s1, s2) in self.deck_combine:
-            player.deck[s1] = Application(player.deck[s1], player.deck[s2]).whnf()
-            del player.deck[s2]
-
-        for e in self.eval_terms:
-            term = EvalIO(game.layout, player.deck[e])
-            print("Player {player_idx} running {term}")
-            player.deck[e] = term.whnf()
 
 class Player(ABC):
     def __init__(self, sec_token, health, mana):
@@ -124,34 +83,47 @@ class ConsolePlayer(Player):
         await self.f_in.readline()
 
         self.surpress_state = True
-
-        await self.f_out.write("Your turn!\n")
-        await self.f_out.write("Combinators:\n")
-        for i, comb in enumerate(self.purchasable_combinators):
-            await self.f_out.write(f"    {i}: {comb.name}: costs {comb.price}𐌼\n")
-
-        await self.f_out.write("Purchase combinators? (comb),* ")
+        await self.f_out.write("What to do (buy [c]ombinator, buy free [v]ariable, [b]ind variable, [a]pply, [e]val) ")
         await self.f_out.flush()
 
-        combinators = [int(x) for x in (await self.f_in.readline()).strip().split(",") if x]
+        choice = (await self.f_in.readline()).strip()
+        if choice == 'c':
+            await self.f_out.write("Combinators:\n")
+            for i, comb in enumerate(self.purchasable_combinators):
+                await self.f_out.write(f"    {i}: {comb.name}: costs {comb.price}𐌼\n")
 
-        await self.f_out.write("Purchase free variables (2𐌼 per variable) (name),*? ")
-        await self.f_out.flush()
+            await self.f_out.write("Purchase combinator (idx)? ")
+            await self.f_out.flush()
+            return PurchaseCombinator(int((await self.f_in.readline()).strip()))
 
-        fvs = [x for x in (await self.f_in.readline()).strip().split(",") if x]
+        if choice == 'v':
+            await self.f_out.write("Variable name? ")
+            await self.f_out.flush()
+            return PurchaseFreeVariable((await self.f_in.readline()).strip())
 
-        await self.f_out.write("Abstractions (2𐌼)  (enter (row-name2caputre)-*),* ")
-        await self.f_out.flush()
+        if choice == 'b':
+            await self.f_out.write("What deck position to bind? ")
+            await self.f_out.flush()
+            row = int((await self.f_in.readline()).strip())
+            await self.f_out.write("Variable name (idx)? ")
+            await self.f_out.flush()
+            name = (await self.f_in.readline()).strip()
 
-        abstractions = [(int(x.split("-")[0]), x.split("-")[1]) for x in (await self.f_in.readline()).strip().split(",") if x]
+            return BindVariable(row, name)
 
-        await self.f_out.write("Combines (f-x),* ")
-        await self.f_out.flush()
-        combines = [(int(y) for y in x.split("-")) for x in (await self.f_in.readline()).strip().split(",") if x]
+        if choice == 'a':
+            await self.f_out.write("What deck position to call? ")
+            await self.f_out.flush()
+            call = int((await self.f_in.readline()).strip())
+            await self.f_out.write("What deck position as argument? ")
+            await self.f_out.flush()
+            arg = int((await self.f_in.readline()).strip())
 
-        await self.f_out.write("Evals (f),* ")
-        await self.f_out.flush()
-        evals = [int(x) for x in (await self.f_in.readline()).strip().split(",") if x]
+            return Apply(call, arg)
 
-        self.surpress_state = False
-        return Action(combinators, fvs, abstractions, combines, evals)
+        if choice == 'e':
+            await self.f_out.write("What deck position to eval? ")
+            await self.f_out.flush()
+            return Eval(int((await self.f_in.readline()).strip()))
+
+        return await self.get_action()
