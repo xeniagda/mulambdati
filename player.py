@@ -59,7 +59,7 @@ class Player(ABC):
         pass
 
     @abstractmethod
-    async def tell_action(self, action):
+    async def tell_msg(self, msg):
         pass
 
     def to_json_obj(self):
@@ -97,7 +97,7 @@ class ConsolePlayer(Player):
 
         await self.f_out.flush()
 
-    async def tell_action(self, action):
+    async def tell_msg(self, action):
         await self.f_out.write(f"[!! {action} !!]\n")
         await self.f_out.flush()
 
