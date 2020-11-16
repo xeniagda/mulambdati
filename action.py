@@ -89,5 +89,5 @@ class Eval(Action):
     async def run(self, game, player_idx):
         player = game.players[player_idx]
 
-        term = eval_monad_io(game.layout, player.deck[self.deck_idx])
+        term = eval_monad_io(game.layout, player.deck[self.deck_idx], game=game, player_idx=player_idx)
         player.deck[self.deck_idx] = term.whnf()

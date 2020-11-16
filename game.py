@@ -22,11 +22,10 @@ class Combinator:
         }
 
 class Game:
-    def __init__(self, players, layout_const):
+    def __init__(self, players, layout):
         self.players = players
-        self.turn = 0 # indexes players
 
-        self.layout = layout_const(self)
+        self.layout = layout
         self.combinators = []
 
     def add_combinator(self, price, name, term):
@@ -77,40 +76,38 @@ def make_standard_game(player1_const, player2_const):
     pl1 = player1_const(pl1_token, 10, 0)
     pl2 = player2_const(pl2_token, 10, 0)
 
-    def make_layout(game):
-        Identity = Abstraction("x", Variable("x"))
+    Identity = Abstraction("x", Variable("x"))
 
-        def pure(x):
-            return x
+    def pure(x, *, _game, _player_idx):
+        return x
 
-        action_pure = MonadIOAction("pure", ['x'], pure)
+    action_pure = MonadIOAction("pure", ['x'], pure)
 
-        def give_mana():
-            print(f"Player {game.turn} gained 10 mana!")
-            game.players[game.turn].mana += 10
-            return Identity
+    def give_mana(*, game, player_idx):
+        print(f"Player {player_idx} gained 10 mana!")
+        game.players[player_idx].mana += 10
+        return Identity
 
-        action_give_mana = MonadIOAction("give_10_mana", [], give_mana)
+    action_give_mana = MonadIOAction("give_10_mana", [], give_mana)
 
-        def do_damage(x):
-            print(f"Player {game.turn} dealt {x.name} damage!")
-            game.players[~game.turn].health -= x.name
-            return Identity
+    def do_damage(x, *, game, player_idx):
+        print(f"Player {player_idx} dealt {x.name} damage!")
+        game.players[~player_idx].health -= x.name
+        return Identity
 
-        action_do_damage = MonadIOAction("do_damage", ['x'], do_damage)
+    action_do_damage = MonadIOAction("do_damage", ['x'], do_damage)
 
-        def get_opponent_health():
-            print(f"Player {game.turn} gets opponents health!")
-            return Symbol(game.players[~game.turn].health)
+    def get_opponent_health(*, game, player_idx):
+        print(f"Player {player_idx} gets opponents health!")
+        return Symbol(game.players[~player_idx].health)
 
-        action_goh = MonadIOAction("get_opponent_health", [], get_opponent_health)
+    action_goh = MonadIOAction("get_opponent_health", [], get_opponent_health)
 
-        layout = MonadIOLayout([action_pure, action_give_mana, action_do_damage, action_goh])
-        return layout
+    layout = MonadIOLayout([action_pure, action_give_mana, action_do_damage, action_goh])
 
     game = Game(
         [pl1, pl2],
-        make_layout,
+        layout,
     )
 
     game.add_combinator(1, "pure", game.layout.constructor_for_idx(0))
