@@ -75,6 +75,15 @@ class LambdaTerm(ABC):
     def __repr__(self):
         return self.stringify(StringifyMode(), 10)
 
+    @abstractmethod
+    # Turns self into a structure which json.dumps can encode
+    # i.e. strings, numbers, lists, dicts etc.
+    # Convention for objects is to have a dict {"ty": "MyObject", "field_1": ...}
+    # If it's clear from the context, a JSON value may be returned directly, as in the case of
+    # Variable
+    def to_json_obj(self):
+        pass
+
 class Abstraction(LambdaTerm): # λv. t
     def __init__(self, variable, term):
         super(Abstraction, self).__init__()
@@ -128,6 +137,13 @@ class Abstraction(LambdaTerm): # λv. t
     def whnf(self, force_opaques=False):
         return self
 
+    def to_json_obj(self):
+        return {
+            "ty": "Abstraction",
+            "variable": self.variable,
+            "term": self.term.to_json_obj(),
+        }
+
 class Variable(LambdaTerm): # v
     def __init__(self, variable):
         super(Variable, self).__init__()
@@ -155,6 +171,9 @@ class Variable(LambdaTerm): # v
 
     def whnf(self, force_opaques=False):
         return self
+
+    def to_json_obj(self):
+        return self.variable
 
 class Application(LambdaTerm): # t1 t2
     def __init__(self, caller, callee):
@@ -211,6 +230,13 @@ class Application(LambdaTerm): # t1 t2
 
         return Application(caller, self.callee)
 
+    def to_json_obj(self):
+        return {
+            "ty": "Application",
+            "caller": self.caller.to_json_obj(),
+            "callee": self.callee.to_json_obj(),
+        }
+
 
 I = Abstraction("x", Variable("x"))
 
@@ -253,6 +279,13 @@ class Symbol(LambdaTerm): # %evalIO a b
             return other.name == self.name
         return False
 
+    def to_json_obj(self):
+        return {
+            "ty": "Symbol",
+            "name": str(self.name),
+            "symty": type(self.name).__name__,
+        }
+
 class Opaque(LambdaTerm):
     def __init__(self, name, term):
         super(Opaque, self).__init__()
@@ -289,6 +322,14 @@ class Opaque(LambdaTerm):
         if isinstance(other, Opaque):
             return other.name == self.name and self.term == other.term
         return False
+
+    def to_json_obj(self):
+        return {
+            "ty": "Opaque",
+            "name": self.name,
+            "term": self.term.to_json_obj(),
+        }
+
 
 def make_chnum_term(n):
     if n == 0:
