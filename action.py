@@ -59,8 +59,8 @@ class BindVariable(Action):
 
 class Apply(Action):
     def __init__(self, caller_idx, callee_idx):
-        self.caller_idx = caller
-        self.callee_idx = callee
+        self.caller_idx = caller_idx
+        self.callee_idx = callee_idx
 
     def get_price(self, game):
         return 0
