@@ -58,11 +58,11 @@ class Game:
         }
 
 def make_standard_game(player1_const, player2_const):
-    pl1_id = make_random_id()
-    pl2_id = make_random_id()
+    pl1_token = make_random_token()
+    pl2_token = make_random_token()
 
-    pl1 = player1_const(pl1_id, 10, 0)
-    pl2 = player2_const(pl2_id, 10, 0)
+    pl1 = player1_const(pl1_token, 10, 0)
+    pl2 = player2_const(pl2_token, 10, 0)
 
     def make_layout(game):
         Identity = Abstraction("x", Variable("x"))
@@ -108,4 +108,4 @@ def make_standard_game(player1_const, player2_const):
     game.add_combinator(2, "the number 2", Symbol(2))
     game.add_combinator(7, "the number 7", Symbol(7))
 
-    return game, pl1_id, pl2_id
+    return game, pl1_token, pl2_token
