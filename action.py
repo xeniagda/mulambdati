@@ -1,6 +1,6 @@
 from expr import Application, Variable, Abstraction
 from abc import ABC, abstractmethod
-from monad_io import EvalIO
+from monad_io import eval_monad_io
 
 class Action(ABC):
     def __init__(self, combinators, fvs, abstractions, deck_combine, eval_terms):
@@ -16,30 +16,7 @@ class Action(ABC):
 
     @abstractmethod
     async def run(self, game, player_idx):
-        player = game.players[player_idx]
-
-        player.mana += 1
-        for p in self.combinators:
-            comb = game.combinators[p]
-            player.mana -= comb.price
-            player.deck.append(comb.term)
-
-        for fv in self.fvs:
-            player.deck.append(Variable(fv))
-            player.mana -= 2
-
-        for row, name in self.abstractions:
-            player.deck[row] = Abstraction(name, player.deck[row])
-            player.mana -= 2
-
-        for (s1, s2) in self.deck_combine:
-            player.deck[s1] = Application(player.deck[s1], player.deck[s2]).whnf()
-            del player.deck[s2]
-
-        for e in self.eval_terms:
-            term = EvalIO(game.layout, player.deck[e])
-            print("Player {player_idx} running {term}")
-            player.deck[e] = term.whnf()
+        pass
 
 class PurchaseCombinator(Action):
     def __init__(self, combinator_idx):
@@ -112,5 +89,5 @@ class Eval(Action):
     async def run(self, game, player_idx):
         player = game.players[player_idx]
 
-        term = EvalIO(game.layout, player.deck[self.deck_idx])
-        player.deck[e] = term.whnf()
+        term = eval_monad_io(game.layout, player.deck[self.deck_idx])
+        player.deck[self.deck_idx] = term.whnf()

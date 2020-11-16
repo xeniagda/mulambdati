@@ -76,46 +76,23 @@ class MonadIOLayout:
             "actions": [action.to_json_obj() for action in self.actions],
         }
 
-class EvalIO(LambdaTerm): # %evalIO a b
-    def __init__(self, layout, term):
-        super(EvalIO, self).__init__()
-        self.layout = layout
-        self.term = term
+def eval_monad_io(layout, term):
+    monad_res = layout.apply_monad(term).whnf(force_opaques=True)
 
-    def __eq__(self, other):
-        if isinstance(other, EvalIO):
-            return self.term == other.term
-        return False
+    matched = layout.match_monad_result(monad_res)
+    if matched is None:
+        return monad_res
+    else:
+        action, args = matched
 
-    def stringify(self, mode, prec):
-        return "%evalIO " + self.term.stringify(mode, prec)
+        if isinstance(action, BindAction):
+            # Special! y >>= x
+            y_res = eval_monad_io(layout, args[0]).whnf()
+            x_applied = Application(args[1], y_res)
+            return eval_monad_io(layout, x_applied).whnf()
 
-    def free_variables(self):
-        return self.caller.free_variables() | self.callee.free_variables()
-
-    def replace(self, name, term):
-        return Application(self.caller.replace(name, term), self.callee.replace(name, term))
-
-    def beta_reduce(self):
-        return EvalIO(self.term.beta_reduce_once())
-
-    def whnf(self, _force_opaques=False):
-        monad_res = self.layout.apply_monad(self.term).whnf(force_opaques=True)
-
-        matched = self.layout.match_monad_result(monad_res)
-        if matched is None:
-            return monad_res
-        else:
-            action, args = matched
-
-            if isinstance(action, BindAction):
-                # Special! y >>= x
-                y_res = EvalIO(self.layout, args[0]).whnf()
-                x_applied = Application(args[1], y_res)
-                return EvalIO(self.layout, x_applied).whnf()
-
-            res = action.run(*args)
-            return res
+        res = action.run(*args)
+        return res
 
 def _make_standard_io_layout():
     def mpure(x):
@@ -144,7 +121,7 @@ def _make_standard_io_layout():
 
 CONSOLE_IO = _make_standard_io_layout()
 
-CONSOLE_EIO = lambda term: EvalIO(console_io, term)
+CONSOLE_EIO = lambda term: eval_monad_io(CONSOLE_IO, term)
 
 if __name__ == "__main__":
     from expr import *
@@ -183,6 +160,6 @@ if __name__ == "__main__":
     )
 
     print(program)
-    print(CONSOLE_EIO(program).whnf())
+    print(CONSOLE_EIO(program))
 
-    print(console_io.constructor_for_idx(3))
+    print(CONSOLE_IO.constructor_for_idx(3))
