@@ -69,6 +69,24 @@ class Player(ABC):
             "deck": [term.to_json_obj() for term in self.deck],
         }
 
+class ExternalPlayer(ABC):
+    def __init__(self, sec_token, health, mana):
+        super(ExternalPlayer, self).__init__(sec_tkoen, health, mana)
+
+        self.current_state = None
+        self.action_queue = asyncio.Queue()
+
+    async def update_state(self, game):
+        self.current_state = game
+
+    async def get_action(self):
+        return await self.action_queue.get()
+
+    async def tell_msg(self, action):
+        pass # TODO
+
+    async def put_action(self, action):
+        self.action_queue.put(action)
 
 class ConsolePlayer(Player):
     def __init__(self, sec_token, health, mana, f_in, f_out):
