@@ -71,7 +71,7 @@ class Player(ABC):
 
 class ExternalPlayer(ABC):
     def __init__(self, sec_token, health, mana):
-        super(ExternalPlayer, self).__init__(sec_tkoen, health, mana)
+        super(ExternalPlayer, self).__init__(sec_token, health, mana)
 
         self.current_state = None
         self.action_queue = asyncio.Queue()
