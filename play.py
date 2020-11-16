@@ -7,6 +7,8 @@ from player import ConsolePlayer
 from monad_io import MonadIOAction, MonadIOLayout
 from game import Game
 
+import json
+
 async def start():
     tty1i, tty1o, tty2i, tty2o = sys.argv[1:5]
 
@@ -72,6 +74,8 @@ async def start():
     game.add_combinator(1, "bind", game.layout.constructor_for_idx(4))
     game.add_combinator(2, "the number 2", Symbol(2))
     game.add_combinator(7, "the number 7", Symbol(7))
+
+    print(json.dumps(game.to_json_obj()))
 
     await game.start_game()
 

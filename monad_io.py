@@ -24,6 +24,12 @@ class MonadIOAction:
 
         return arg_list[::-1] # Outermost argument last
 
+    def to_json_obj(self):
+        return {
+            "symb": self.symb.name,
+            "arg_names": self.arg_names,
+        }
+
 class BindAction(MonadIOAction):
     def __init__(self):
         super(BindAction, self).__init__("bind", ["io", "iofn"], None)
@@ -64,6 +70,11 @@ class MonadIOLayout:
         result = Opaque(action.symb.name, result)
 
         return result
+
+    def to_json_obj(self):
+        return {
+            "actions": [action.to_json_obj() for action in self.actions],
+        }
 
 class EvalIO(LambdaTerm): # %evalIO a b
     def __init__(self, layout, term):

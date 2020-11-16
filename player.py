@@ -22,9 +22,9 @@ class Action:
 
         player.mana += 1
         for p in self.combinators:
-            price, _name, term = game.combinators[p]
-            player.mana -= price
-            player.deck.append(term)
+            comb = game.combinators[p]
+            player.mana -= comb.price
+            player.deck.append(comb.term)
 
         for fv in self.fvs:
             player.deck.append(Variable(fv))
@@ -61,6 +61,14 @@ class Player(ABC):
     @abstractmethod
     async def tell_action(self, action):
         pass
+
+    def to_json_obj(self):
+        return {
+            "health": self.health,
+            "mana": self.mana,
+            "deck": [term.to_json_obj() for term in self.deck],
+        }
+
 
 class ConsolePlayer(Player):
     def __init__(self, sec_token, health, mana, f_in, f_out):
@@ -101,8 +109,8 @@ class ConsolePlayer(Player):
 
         await self.f_out.write("Your turn!\n")
         await self.f_out.write("Combinators:\n")
-        for i, (price, name, term) in enumerate(self.purchasable_combinators):
-            await self.f_out.write(f"    {i}: {name}: costs {price}𐌼\n")
+        for i, comb in enumerate(self.purchasable_combinators):
+            await self.f_out.write(f"    {i}: {comb.name}: costs {comb.price}𐌼\n")
 
         await self.f_out.write("Purchase combinators? (comb),* ")
         await self.f_out.flush()

@@ -2,6 +2,19 @@ from expr import LambdaTerm, Abstraction, Application, Symbol, Variable, make_ch
 from player import Player
 import asyncio
 
+class Combinator:
+    def __init__(self, name, price, term):
+        self.name = name
+        self.price = price
+        self.term = term
+
+    def to_json_obj(self):
+        return {
+            "name": self.name,
+            "price": self.price,
+            "term": self.term.to_json_obj(),
+        }
+
 class Game:
     def __init__(self, players, layout_const):
         self.players = players
@@ -11,7 +24,7 @@ class Game:
         self.combinators = []
 
     def add_combinator(self, price, name, term):
-        self.combinators.append((price, name, term))
+        self.combinators.append(Combinator(name, price, term))
 
     async def start_game(self):
         tasks = []
@@ -36,4 +49,9 @@ class Game:
             for player in self.players:
                 await player.update_state(self)
 
-
+    def to_json_obj(self):
+        return {
+            "players": [player.to_json_obj() for player in self.players],
+            "layout": self.layout.to_json_obj(),
+            "combinators": [comb.to_json_obj() for comb in self.combinators],
+        }
