@@ -10,12 +10,17 @@ def make_json_response(data, status=200):
         content_type='application/json',
     )
 
-def pl_fn(*, find_player, read_data):
+def pl_fn(*, find_player, read_data, expects=None):
+    if not read_data and expects is not None:
+        raise ValueError("read_data = False, expects != None")
     def decorator(f):
         async def inner(self, req):
             if read_data:
                 try:
                     data = await req.json()
+                    for key in expects:
+                        if key not in data:
+                            return make_json_response({"expected": expects, "missing": key}, status=400)
                 except Exception as e:
                     print("JSON decode error:", e)
                     return make_json_response({"error": "invalid json!"}, status=400)
@@ -41,6 +46,8 @@ def pl_fn(*, find_player, read_data):
                 args.append(data)
 
             resp = await f(self, *args)
+            if isinstance(resp, web.Response):
+                return resp
 
             return make_json_response(resp)
 
