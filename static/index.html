@@ -63,12 +63,17 @@ h3 {
 
 }
 
-.you .plname::after {
-    content: "(you)";
+.you > .stats > .plname::after {
+    content: " (you)";
 }
 
-:not(.you) .plname::after {
-    content: "(not you)";
+:not(.you) > .stats > .plname::after {
+    content: " (not you)";
+}
+
+.card {
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 #combinators {
