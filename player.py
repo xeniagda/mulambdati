@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from action import *
 import asyncio
+from token_gen import make_random_token
 
 class Player(ABC):
     def __init__(self, sec_token, health, mana):
@@ -34,6 +35,7 @@ class ExternalPlayer(Player):
 
         self.current_state = None
         self.action_queue = asyncio.Queue()
+        self.msg_list = [] # (random id, msg), id filtered by the client
 
     async def update_state(self, game):
         self.current_state = game
@@ -41,8 +43,8 @@ class ExternalPlayer(Player):
     async def get_action(self):
         return await self.action_queue.get()
 
-    async def tell_msg(self, action):
-        pass # TODO
+    async def tell_msg(self, msg):
+        self.msg_list.append((make_random_token(), action))
 
     async def put_action(self, action):
         self.action_queue.put(action)
