@@ -64,13 +64,15 @@ class GameState:
         self.unclaimed_tokens = set()
         self.app = app
 
-        app.router.add_get("/state", self.get_state)
-        app.router.add_post("/join_game", self.join_game)
-        app.router.add_post("/action/purchase_combinator", self.action_purchase_combinator)
-        app.router.add_post("/action/purchase_free_variable", self.action_purchase_free_variable)
-        app.router.add_post("/action/bind_variable", self.action_bind_variable)
-        app.router.add_post("/action/apply", self.action_apply)
-        app.router.add_post("/action/eval", self.action_eval)
+        app.router.add_get("/api/state", self.get_state)
+        app.router.add_post("/api/join_game", self.join_game)
+        app.router.add_post("/api/action/purchase_combinator", self.action_purchase_combinator)
+        app.router.add_post("/api/action/purchase_free_variable", self.action_purchase_free_variable)
+        app.router.add_post("/api/action/bind_variable", self.action_bind_variable)
+        app.router.add_post("/api/action/apply", self.action_apply)
+        app.router.add_post("/api/action/eval", self.action_eval)
+
+        app.router.add_static("/", '../static')
 
         self.game_futures = []
 
