@@ -4,6 +4,7 @@ from game import make_standard_game
 from player import ExternalPlayer
 import traceback
 import json
+from action import *
 
 def make_json_response(data, status=200):
     return web.Response(
@@ -65,6 +66,13 @@ class GameState:
 
         app.router.add_get("/state", self.get_state)
         app.router.add_post("/join_game", self.join_game)
+        app.router.add_post("/action/purchase_combinator", self.action_purchase_combinator)
+        app.router.add_post("/action/purchase_free_variable", self.action_purchase_free_variable)
+        app.router.add_post("/action/bind_variable", self.action_bind_variable)
+        app.router.add_post("/action/apply", self.action_apply)
+        app.router.add_post("/action/eval", self.action_eval)
+
+        self.game_futures = []
 
     def add_new_game(self):
         print("Making new game")
@@ -109,6 +117,32 @@ class GameState:
 
     def run(self):
         web.run_app(self.app)
+
+    @pl_fn(find_player=True, read_data=True, expects=["combinator_idx"])
+    async def action_purchase_combinator(self, i, game, data):
+        await game.players[i].put_action(PurchaseCombinator(data["combinator_idx"]))
+        return {}
+
+
+    @pl_fn(find_player=True, read_data=True, expects=["var_name"])
+    async def action_purchase_free_variable(self, i, game, data):
+        await game.players[i].put_action(PurchaseFreeVariable(data["var_name"]))
+        return {}
+
+    @pl_fn(find_player=True, read_data=True, expects=["bind_name", "deck_idx"])
+    async def action_bind_variable(self, i, game, data):
+        await game.players[i].put_action(BindVariable(data["bind_name"], data["deck_idx"]))
+        return {}
+
+    @pl_fn(find_player=True, read_data=True, expects=["caller_idx", "callee_idx"])
+    async def action_apply(self, i, game, data):
+        await game.players[i].put_action(Apply(data["caller_idx"], data["callee_idx"]))
+        return {}
+
+    @pl_fn(find_player=True, read_data=True, expects=["deck_idx"])
+    async def action_eval(self, i, game, data):
+        await game.players[i].put_action(Eval(data["deck_idx"]))
+        return {}
 
 
 app = web.Application()
