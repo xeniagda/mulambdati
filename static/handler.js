@@ -1,11 +1,12 @@
+
 async function join_if_needed() {
-    let state = await fetch('http://0.0.0.0:8080/api/state', {
+    let state = await fetch('/api/state', {
         method: 'GET',
         credentials: 'same-origin',
     });
 
     if (state.status == 400) {
-        await fetch('http://0.0.0.0:8080/api/join_game', {
+        await fetch('/api/join_game', {
             method: 'POST',
             credentials: 'same-origin',
         });
@@ -15,7 +16,7 @@ async function join_if_needed() {
 async function read_state() {
     await join_if_needed();
 
-    let resp = await fetch('http://0.0.0.0:8080/api/state', {
+    let resp = await fetch('/api/state', {
         method: 'GET',
         credentials: 'same-origin',
     });
