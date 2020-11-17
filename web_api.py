@@ -1,3 +1,4 @@
+import asyncio
 from aiohttp import web
 from game import make_standard_game
 from player import ExternalPlayer
@@ -71,6 +72,8 @@ class GameState:
         self.games_in_progress.append(game)
         self.unclaimed_tokens.add(p1)
         self.unclaimed_tokens.add(p2)
+
+        asyncio.run_coroutine_threadsafe(game.start_game(), asyncio.get_running_loop())
 
     def claim_unclaimed_token(self):
         if len(self.unclaimed_tokens) == 0:
