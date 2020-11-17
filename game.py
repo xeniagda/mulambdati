@@ -2,11 +2,7 @@ from expr import LambdaTerm, Abstraction, Application, Symbol, Variable, make_ch
 from monad_io import MonadIOAction, MonadIOLayout
 from player import Player
 import asyncio
-import random
-
-words = open("/usr/share/dict/words", "r").read().split("\n")
-def make_random_token():
-    return "apio" + random.choice(words) + random.choice(words)
+from token_gen import make_random_token
 
 class Combinator:
     def __init__(self, name, price, term):
