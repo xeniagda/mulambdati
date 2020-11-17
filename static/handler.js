@@ -13,6 +13,8 @@ async function join_if_needed() {
     }
 }
 
+var last_combinators = undefined;
+
 async function read_state() {
     await join_if_needed();
 
@@ -30,10 +32,13 @@ async function read_state() {
     document.getElementById("players").appendChild(left);
     document.getElementById("players").appendChild(right);
 
-    let combinators = render_combinators(data.game.combinators)
-    document.getElementById("combinators").innerHTML = "";
-    combinators.forEach(e => document.getElementById("combinators").appendChild(e));
+    if (JSON.stringify(data.game.combinators) !== JSON.stringify(last_combinators)) {
+        let combinators = render_combinators(data.game.combinators)
+        document.getElementById("combinators").innerHTML = "";
+        combinators.forEach(e => document.getElementById("combinators").appendChild(e));
 
+        last_combinators = data.game.combinators;
+    }
     await new Promise(r => setTimeout(r, 250));
     await read_state(); // Hopefully stack doesn't overflow lol
 }
