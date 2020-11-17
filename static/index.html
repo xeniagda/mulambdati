@@ -8,6 +8,7 @@ body {
     --col-back-you: #4a824e;
     --col-back-enemy: #BE6C17;
     --col-back-combinator: #74CCA3;
+    --col-back-fv: #D9F5C4;
     --col-prim-1: #C9F1EB;
 
     font-family: monospace;
@@ -67,6 +68,11 @@ body {
 #combinators {
     display: flex;
     flex-direction: row;
+    flex-flow: wrap;
+}
+
+#free-variable {
+    background: var(--col-back-fv);
 }
 
 .combinator {
@@ -132,8 +138,16 @@ body {
                 </div>
             </div>
         </div>
-        <h3> combinators </h3>
+
+        <h3> purchase </h3>
         <div id="combinators">
+            <div class="combinator" id="free-variable">
+                <div class="comb-heading">
+                    <div class="comb-number"> -1. </div>
+                    <div class="comb-cost"> 2𐌼 </div>
+                </div>
+                <div class="comb-description"> Free Variable </div>
+            </div>
             <div class="combinator">
                 <div class="comb-heading">
                     <div class="comb-number"> 0. </div>
