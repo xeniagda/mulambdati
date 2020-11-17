@@ -47,7 +47,7 @@ class ExternalPlayer(Player):
         self.msg_list.append((make_random_token(), action))
 
     async def put_action(self, action):
-        self.action_queue.put(action)
+        await self.action_queue.put(action)
 
     def to_json_obj(self):
         return {
