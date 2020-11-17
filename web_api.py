@@ -18,7 +18,7 @@ def pl_fn(*, find_player, read_data):
                     data = await req.json()
                 except Exception as e:
                     print("JSON decode error:", e)
-                    return make_json_response({"error": "invaltoken json!"}, status=400)
+                    return make_json_response({"error": "invalid json!"}, status=400)
 
             if find_player:
                 if not 'sec_token' in req.cookies:
