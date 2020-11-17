@@ -32,6 +32,9 @@ async function read_state() {
     let combinators = render_combinators(data.game.combinators)
     document.getElementById("combinators").innerHTML = "";
     combinators.forEach(e => document.getElementById("combinators").appendChild(e));
+
+    await new Promise(r => setTimeout(r, 250));
+    await read_state(); // Hopefully stack doesn't overflow lol
 }
 
 read_state();
