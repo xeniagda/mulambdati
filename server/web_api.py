@@ -10,6 +10,7 @@ def make_json_response(data, status=200):
     return web.Response(
         body=json.dumps(data),
         content_type='application/json',
+        status=status,
     )
 
 def pl_fn(*, find_player, read_data, expects=None):
