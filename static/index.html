@@ -17,6 +17,10 @@ body {
     font-size: 12px;
 }
 
+h3 {
+    margin: 0px;
+}
+
 #players {
     display: flex;
     justify-content: center;
@@ -26,7 +30,7 @@ body {
     box-sizing: border-box;
     margin-left: 3em;
     margin-right: 3em;
-    margin-top: 1em;
+    margin-top: 0.5em;
     padding: 0.5em;
     width: 30%;
 
@@ -75,6 +79,13 @@ body {
     background: var(--col-back-fv);
 }
 
+#fv-name {
+    width: 3em;
+    font-size: 16px;
+    padding: 0.5em;
+    border-radius: 0.5em;
+}
+
 .combinator {
     background: var(--col-back-combinator);
     color: black;
@@ -103,7 +114,6 @@ body {
 
 </head>
 
-
 <body>
 
 <h1>
@@ -127,8 +137,8 @@ body {
             <div class="player" id="player-2">
                 <div class="stats">
                     <h3 class="plname"> Player 2 </h3> <br/>
-                    Health: 7hp <br/>
-                    Mana: 30𐌼 <br/>
+                    7hp :Health <br/>
+                    30𐌼 :Mana <br/>
                 </div>
                 <h3> :Deck </h3>
                 <div class="deck">
@@ -146,7 +156,10 @@ body {
                     <div class="comb-number"> -1. </div>
                     <div class="comb-cost"> 2𐌼 </div>
                 </div>
-                <div class="comb-description"> Free Variable </div>
+                <div class="comb-description">
+                    Free Variable <br> (might cost money) <br>
+                    <input id="fv-name" type="text" placeholder="x"></input>
+                </div>
             </div>
             <div class="combinator">
                 <div class="comb-heading">
