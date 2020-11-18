@@ -14,8 +14,6 @@ function render_player(playerdata, left, is_you) {
         return left ? word + punct : punct + word;
     }
 
-    console.log("rendering player");
-    console.log(player);
     var player = document.createElement("div");
     player.className = "player";
 
