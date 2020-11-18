@@ -36,19 +36,58 @@ function render_player(playerdata, left, is_you) {
         let rendered = element_with_class_and_text("div", "term", term.rendered);
         if (clstate.selected_deck == term.id) {
             card.classList.add("card-selected");
+
             card.onmousedown = async (e) => {
-                clstate.selected_deck = null;
-                await render();
+                if (e.target === this) {
+                    clstate.selected_deck = null;
+                    clstate.binding_fv = false;
+                    await render();
+                }
             };
 
             card.appendChild(rendered);
 
-            var eval_button = element_with_class_and_text("div", "button", "eval");
-            eval_button.onmousedown = ((i) => async (e) => {
-                action_eval(i);
-            })(i);
+            var button_container = element_with_class_and_text("div", "button-container", "");;
 
-            card.appendChild(eval_button);
+            if (clstate.binding_fv) {
+                var fv_select = element_with_class_and_text("select", "", "");
+
+                for (var j = 0; j < term.free_vars.length; j++) {
+                    let free = term.free_vars[j];
+                    var opt = element_with_class_and_text("option", "", free);
+                    opt.value = free;
+                    fv_select.appendChild(opt);
+                }
+                var opt_custom = element_with_class_and_text("option", "", "new (enter name)");
+                opt_custom.value = "(new)";
+                fv_select.appendChild(opt_custom);
+
+                opt_custom.onselect = console.log;
+
+                button_container.appendChild(fv_select);
+
+                var perform_button = element_with_class_and_text("div", "button", "perform bind");
+
+                button_container.appendChild(perform_button);
+            } else {
+                var eval_button = element_with_class_and_text("div", "button", "eval");
+                eval_button.onmousedown = ((i) => async (e) => {
+                    action_eval(i);
+                })(i);
+                button_container.appendChild(eval_button);
+
+                var bind_fv_button = element_with_class_and_text("div", "button", "bind fv");
+
+                bind_fv_button.onmousedown = async (e) => {
+                    clstate.selected_deck = term.id;
+                    clstate.binding_fv = true;
+                    await render();
+                };
+
+                button_container.appendChild(bind_fv_button);
+            }
+
+            card.appendChild(button_container)
         } else {
             card.onmousedown = ((i, term) => async (e) => {
                 if (clstate.selected_deck == null) {
@@ -76,6 +115,16 @@ function render_player(playerdata, left, is_you) {
     }
 
     player.appendChild(deck);
+
+    player.onclick = ((player) => async (e) => {
+        if (e.target === player || e.target == stats || e.target == deck) {
+
+            clstate.selected_deck = null;
+            clstate.binding_fv = false;
+
+            await render();
+        }
+    })(player);
 
     return player;
 }

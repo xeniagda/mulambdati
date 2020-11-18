@@ -17,6 +17,7 @@ var last_combinators = undefined;
 
 var clstate = {
     "selected_deck": null,
+    "binding_fv": false,
     "fv_name": "",
 };
 
@@ -32,13 +33,20 @@ async function read_state() {
     data = await resp.json();
 }
 
-async function render() {
-    let left = render_player(data.game.players[0], true, data.you_are == 0);
-    let right = render_player(data.game.players[1], false, data.you_are == 1);
+async function render(last_data) {
+    players = document.getElementById("players");
+    if (!(clstate.binding_fv && data.you_are == 0) || last_data === undefined) {
+        let left = render_player(data.game.players[0], true, data.you_are == 0);
 
-    document.getElementById("players").innerHTML = "";
-    document.getElementById("players").appendChild(left);
-    document.getElementById("players").appendChild(right);
+        players.removeChild(players.children[0]);
+        players.insertBefore(left, players.children[0]);
+    }
+    if (!(clstate.binding_fv && data.you_are == 1) || last_data === undefined) {
+        let right = render_player(data.game.players[1], false, data.you_are == 1);
+
+        players.removeChild(players.children[1]);
+        players.children[0].insertAdjacentElement('afterend', right);
+    }
 
     if (JSON.stringify(data.game.combinators) !== JSON.stringify(last_combinators)) {
         let combinators = render_combinators(data.game.combinators)
@@ -51,8 +59,9 @@ async function render() {
 
 async function render_loop() {
     while (true) {
+        let last_data = data;
         await read_state();
-        await render();
+        await render(last_data);
         await new Promise(r => setTimeout(r, 250));
     }
 }
