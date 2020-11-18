@@ -26,7 +26,14 @@ class Player(ABC):
         return {
             "health": self.health,
             "mana": self.mana,
-            "deck": [{"structure": term.to_json_obj(), "rendered": str(term)} for term in self.deck],
+            "deck": [
+                {
+                    "structure": term.to_json_obj(),
+                    "rendered": str(term),
+                    "free-vars": list(term.free_variables()),
+                }
+                for term in self.deck
+            ],
         }
 
 class ExternalPlayer(Player):
