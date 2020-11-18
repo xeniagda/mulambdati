@@ -71,7 +71,7 @@ function render_combinators(combinatorsdata) {
         clstate.fv_name = e.target.value;
     };
 
-    free_variable.onmousedown = (e) => {
+    free_variable.onmousedown = async (e) => {
         if (e.target == input) {
             return;
         }
@@ -79,7 +79,7 @@ function render_combinators(combinatorsdata) {
             input.classList.add("flash-red");
         } else {
             free_variable.classList.add("clicked");
-            action_purchase_fv(clstate.fv_name);
+            await action_purchase_fv(clstate.fv_name);
         }
     };
 
@@ -103,8 +103,8 @@ function render_combinators(combinatorsdata) {
         var number = element_with_class_and_text("div", "comb-number", i);
         heading.appendChild(number);
 
-        combinator.onclick = ((i) => (e) => {
-            action_purchase_combinator(i);
+        combinator.onclick = ((i) => async (e) => {
+            await action_purchase_combinator(i);
         })(i);
 
         var cost = element_with_class_and_text("div", "comb-number", combinatorData.price + "𐌼");
