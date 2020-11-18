@@ -50,12 +50,9 @@ class ExternalPlayer(Player):
         await self.action_queue.put(action)
 
     def to_json_obj(self):
-        return {
-            "health": self.health,
-            "mana": self.mana,
-            "deck": [term.to_json_obj() for term in self.deck],
-            "msg_list": [{"id": rid, "msg": msg} for rid, msg in self.msg_list]
-        }
+        orig = super().to_json_obj()
+        orig["msg_list"] = [{"id": rid, "msg": msg} for rid, msg in self.msg_list]
+        return orig
 
 class ConsolePlayer(Player):
     def __init__(self, sec_token, health, mana, f_in, f_out):
