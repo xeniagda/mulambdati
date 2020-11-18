@@ -34,10 +34,10 @@ function render_player(playerdata, left, is_you) {
 
         let card = element_with_class_and_text("div", "card", "");
         let rendered = element_with_class_and_text("div", "term", term.rendered);
-        if (clstate.selected_deck == i) {
+        if (clstate.selected_deck == term.id) {
             card.classList.add("card-selected");
             card.onmousedown = async (e) => {
-                clstate.selected_deck = -1;
+                clstate.selected_deck = null;
                 await render();
             };
 
@@ -50,17 +50,25 @@ function render_player(playerdata, left, is_you) {
 
             card.appendChild(eval_button);
         } else {
-            card.onmousedown = ((i) => async (e) => {
-                if (clstate.selected_deck == -1) {
-                    clstate.selected_deck = i;
+            card.onmousedown = ((i, term) => async (e) => {
+                if (clstate.selected_deck == null) {
+                    clstate.selected_deck = term.id;
                 } else {
-                    let caller = clstate.selected_deck;
-                    clstate.selected_deck = -1;
+                    var caller = null;
+                    for (var j = 0; j < playerdata.deck.length; j++) {
+                        if (playerdata.deck[j].id == clstate.selected_deck) {
+                            caller = j;
+                        }
+                    }
+                    console.log(caller);
+                    clstate.selected_deck = null;
                     await render();
-                    await action_apply(caller, i);
+                    if (caller !== null) {
+                        await action_apply(caller, i);
+                    }
                 }
                 await render();
-            })(i);
+            })(i, term);
         card.appendChild(rendered);
         }
 

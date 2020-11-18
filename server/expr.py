@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import random
 
 letters = "abcdefghijklmnopqrstuvwxyz"
 def n_to_base(n, base):
@@ -42,6 +43,13 @@ class StringifyMode:
 #   a b = 0
 
 class LambdaTerm(ABC):
+    def __init__(self):
+        self.id = hex(random.randrange(0, 1 << 32))
+
+    @abstractmethod
+    def clone(self):
+        pass
+
     @abstractmethod
     def stringify(self, mode, prec):
         pass
@@ -84,11 +92,15 @@ class LambdaTerm(ABC):
     def to_json_obj(self):
         pass
 
+
 class Abstraction(LambdaTerm): # λv. t
     def __init__(self, variable, term):
         super(Abstraction, self).__init__()
         self.variable = variable
         self.term = term
+
+    def clone(self):
+        return Abstraction(self.variable, self.term.clone())
 
     def __eq__(self, other):
         if isinstance(other, Abstraction):
@@ -150,6 +162,9 @@ class Variable(LambdaTerm): # v
 
         self.variable = variable
 
+    def clone(self):
+        return Variable(self.variable)
+
     def __eq__(self, other):
         if isinstance(other, Variable):
             return self.variable == other.variable
@@ -180,6 +195,9 @@ class Application(LambdaTerm): # t1 t2
         super(Application, self).__init__()
         self.caller = caller
         self.callee = callee
+
+    def clone(self):
+        return Application(self.caller.clone(), self.callee.clone())
 
     def __eq__(self, other):
         if isinstance(other, Application):
@@ -237,7 +255,6 @@ class Application(LambdaTerm): # t1 t2
             "callee": self.callee.to_json_obj(),
         }
 
-
 I = Abstraction("x", Variable("x"))
 
 def multi_apply(fun, *args):
@@ -255,6 +272,9 @@ class Symbol(LambdaTerm): # %evalIO a b
     def __init__(self, symbol):
         super(Symbol, self).__init__()
         self.name = symbol
+
+    def clone(self):
+        return Symbol(self.name)
 
     def stringify(self, mode, prec):
         if isinstance(self.name, str):
@@ -291,6 +311,9 @@ class Opaque(LambdaTerm):
         super(Opaque, self).__init__()
         self.name = name
         self.term = term
+
+    def clone(self):
+        return Opaque(self.name, self.term.clone())
 
     def stringify(self, mode, prec):
         if mode.expand_opaques():

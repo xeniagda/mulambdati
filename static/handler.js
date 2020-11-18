@@ -16,7 +16,7 @@ async function join_if_needed() {
 var last_combinators = undefined;
 
 var clstate = {
-    "selected_deck": -1,
+    "selected_deck": "",
     "fv_name": "",
 };
 

@@ -29,8 +29,8 @@ class PurchaseCombinator(Action):
         player = game.players[player_idx]
 
         comb = game.combinators[self.combinator_idx]
+        player.deck.append(comb.term.clone())
 
-        player.deck.append(comb.term)
 
 class PurchaseFreeVariable(Action):
     def __init__(self, var_name):
