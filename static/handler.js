@@ -87,3 +87,17 @@ async function action_purchase_fv(fv_name) {
     await read_state();
     await render();
 }
+
+async function action_apply(caller, callee) {
+    await fetch('/api/action/apply', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify( { "caller_idx": caller, "callee_idx": callee, } )
+    });
+
+    await read_state();
+    await render();
+}

@@ -37,6 +37,24 @@ function render_player(playerdata, left, is_you) {
         let term = playerdata.deck[i];
         let rendered = render_lambda_expression();
         let card = element_with_class_and_text("div", "card", "");
+        if (clstate.selected_deck == i) {
+            card.classList.add("card-selected");
+            card.onclick = async (e) => {
+                clstate.selected_deck = -1;
+                await render();
+            };
+        } else {
+            card.onclick = ((i) => async (e) => {
+                if (clstate.selected_deck == -1) {
+                    clstate.selected_deck = i;
+                } else {
+                    let caller = clstate.selected_deck;
+                    clstate.selected_deck = -1;
+                    await action_apply(caller, i);
+                }
+                await render();
+            })(i);
+        }
 
         card.appendChild(rendered);
         deck.appendChild(card);
