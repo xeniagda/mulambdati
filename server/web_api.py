@@ -80,6 +80,8 @@ class GameState:
         self.unclaimed_tokens = set()
         self.app = app
 
+        app.router.add_get("/", self.index)
+
         app.router.add_get("/api/state", self.get_state)
         app.router.add_post("/api/join_game", self.join_game)
         app.router.add_post("/api/action/purchase_combinator", self.action_purchase_combinator)
@@ -100,6 +102,13 @@ class GameState:
         self.unclaimed_tokens.add(p2)
 
         asyncio.run_coroutine_threadsafe(game.start_game(), asyncio.get_running_loop())
+
+    async def index(self, req):
+        return web.Response(
+            body=open("../static/index.html", "r").read(),
+            content_type='text/html',
+            status=200,
+        )
 
     def claim_unclaimed_token(self):
         logging.info("User claiming token")
