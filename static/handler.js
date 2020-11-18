@@ -58,3 +58,16 @@ async function render_loop() {
 }
 
 render_loop();
+
+
+async function action_purchase_combinator(c_idx) {
+    await fetch('/api/action/purchase_combinator', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify( { "combinator_idx": c_idx } )
+    });
+
+}

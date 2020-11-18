@@ -85,6 +85,11 @@ function render_combinators(combinatorsdata) {
         var heading = element_with_class_and_text("div", "comb-heading", "");
         var number = element_with_class_and_text("div", "comb-number", i);
         heading.appendChild(number);
+
+        combinator.onclick = ((i) => (e) => {
+            action_purchase_combinator(i);
+        })(i);
+
         var cost = element_with_class_and_text("div", "comb-number", combinatorData.price + "𐌼");
         heading.appendChild(cost);
 
