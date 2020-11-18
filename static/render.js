@@ -49,24 +49,75 @@ function render_player(playerdata, left, is_you) {
 
             var button_container = element_with_class_and_text("div", "button-container", "");;
 
-            if (clstate.binding_fv) {
+            if (clstate.binding_fv !== -1) {
                 var fv_select = element_with_class_and_text("select", "", "");
+                fv_select.id = "fv-select";
 
                 for (var j = 0; j < term.free_vars.length; j++) {
                     let free = term.free_vars[j];
                     var opt = element_with_class_and_text("option", "", free);
                     opt.value = free;
+                    if (j === clstate.binding_fv) {
+                        opt.selected = true;
+                    }
                     fv_select.appendChild(opt);
                 }
-                var opt_custom = element_with_class_and_text("option", "", "new (enter name)");
-                opt_custom.value = "(new)";
+                var opt_custom = element_with_class_and_text("option", "", "new");
+                opt_custom.value = "new-var";
                 fv_select.appendChild(opt_custom);
 
-                opt_custom.onselect = console.log;
+                if (clstate.binding_fv == term.free_vars.length) {
+                    opt_custom.selected = true;
+                }
+
+                fv_select.onchange = async (e) => {
+                    console.log(e.target.selectedIndex);
+                    clstate.binding_fv = e.target.selectedIndex;
+                    await render();
+                };
 
                 button_container.appendChild(fv_select);
 
+                if (clstate.binding_fv == term.free_vars.length) {
+                    var varname = element_with_class_and_text("input", "fv-input", "");
+                    varname.value = clstate.fv_name;
+                    varname.focus();
+                    if (clstate.fv_name === "") {
+                        varname.classList.add("flash-red");
+                    }
+                    varname.id = "bind-fv-name";
+                    varname.type = "text";
+                    varname.placeholder = "x";
+
+                    varname.oninput = async (e) => {
+                        clstate.fv_name = e.target.value;
+
+                        if (clstate.fv_name === "") {
+                            e.target.classList.add("flash-red");
+                        } else {
+                            e.target.classList.remove("flash-red");
+                        }
+                    };
+
+                    button_container.appendChild(varname);
+                }
+
                 var perform_button = element_with_class_and_text("div", "button", "perform bind");
+                perform_button.onmousedown = ((i) => async (e) => {
+                    var bind_name;
+                    if (clstate.binding_fv == term.free_vars.length) {
+                        bind_name = clstate.fv_name;
+                        if (bind_name === "") {
+                            return;
+                        }
+                    } else {
+                        bind_name = document.getElementById("fv-select").value;
+                    }
+
+
+                    await action_bind(i, bind_name);
+                    await render();
+                })(i);
 
                 button_container.appendChild(perform_button);
             } else {
@@ -80,7 +131,7 @@ function render_player(playerdata, left, is_you) {
 
                 bind_fv_button.onmousedown = async (e) => {
                     clstate.selected_deck = term.id;
-                    clstate.binding_fv = true;
+                    clstate.binding_fv = 0;
                     await render();
                 };
 
@@ -147,7 +198,7 @@ function render_combinators(combinatorsdata) {
     description.appendChild(element_with_class_and_text("br", "", ""));
     description.appendChild(document.createTextNode("(might cost money)"));
     description.appendChild(element_with_class_and_text("br", "", ""));
-    var input = element_with_class_and_text("input", "", clstate.fv_name);
+    var input = element_with_class_and_text("input", "fv-input", clstate.fv_name);
 
     input.oninput = (e) => {
         clstate.fv_name = e.target.value;

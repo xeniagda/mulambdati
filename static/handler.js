@@ -17,7 +17,7 @@ var last_combinators = undefined;
 
 var clstate = {
     "selected_deck": null,
-    "binding_fv": false,
+    "binding_fv": -1, // -1 = not binding, n = binding, selected variant n
     "fv_name": "",
 };
 
@@ -35,13 +35,13 @@ async function read_state() {
 
 async function render(last_data) {
     players = document.getElementById("players");
-    if (!(clstate.binding_fv && data.you_are == 0) || last_data === undefined) {
+    if (!(clstate.binding_fv !== -1 && data.you_are == 0) || last_data === undefined) {
         let left = render_player(data.game.players[0], true, data.you_are == 0);
 
         players.removeChild(players.children[0]);
         players.insertBefore(left, players.children[0]);
     }
-    if (!(clstate.binding_fv && data.you_are == 1) || last_data === undefined) {
+    if (!(clstate.binding_fv !== -1 && data.you_are == 1) || last_data === undefined) {
         let right = render_player(data.game.players[1], false, data.you_are == 1);
 
         players.removeChild(players.children[1]);
@@ -119,6 +119,20 @@ async function action_eval(idx) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify( { "deck_idx": idx } )
+    });
+
+    await read_state();
+    await render();
+}
+
+async function action_bind(idx, name) {
+    await fetch('/api/action/bind_variable', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify( { "bind_name": name, "deck_idx": idx, } )
     });
 
     await read_state();
