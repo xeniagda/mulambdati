@@ -65,7 +65,12 @@ function render_combinators(combinatorsdata) {
     description.appendChild(element_with_class_and_text("br", "", ""));
     description.appendChild(document.createTextNode("(might cost money)"));
     description.appendChild(element_with_class_and_text("br", "", ""));
-    var input = element_with_class_and_text("input", "", "");
+    var input = element_with_class_and_text("input", "", clstate.fv_name);
+
+    input.oninput = (e) => {
+        clstate.fv_name = e.target.value;
+    };
+
     input.id = "fv-name";
     input.type = "text";
     input.placeholder = "x";
