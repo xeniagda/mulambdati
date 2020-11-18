@@ -126,7 +126,7 @@ class Abstraction(LambdaTerm): # λv. t
             return res
 
     def free_variables(self):
-        return self.term.free_variables() - set(self.variable)
+        return self.term.free_variables() - set([self.variable])
 
     def replace(self, name, term):
         if self.variable == name:

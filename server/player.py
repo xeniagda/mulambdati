@@ -30,7 +30,7 @@ class Player(ABC):
                 {
                     "structure": term.to_json_obj(),
                     "rendered": str(term),
-                    "free-vars": list(term.free_variables()),
+                    "free_vars": list(term.free_variables()),
                     "id": term.id,
                 }
                 for term in self.deck
