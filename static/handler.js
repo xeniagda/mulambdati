@@ -70,4 +70,6 @@ async function action_purchase_combinator(c_idx) {
         body: JSON.stringify( { "combinator_idx": c_idx } )
     });
 
+    await read_state();
+    await render();
 }
