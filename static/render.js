@@ -40,7 +40,7 @@ function render_player(playerdata, left, is_you) {
             card.onmousedown = async (e) => {
                 if (e.target === this) {
                     clstate.selected_deck = null;
-                    clstate.binding_fv = false;
+                    clstate.binding_fv = -1;
                     await render();
                 }
             };
@@ -113,7 +113,8 @@ function render_player(playerdata, left, is_you) {
                     } else {
                         bind_name = document.getElementById("fv-select").value;
                     }
-
+                    clstate.selected_deck = null;
+                    clstate.binding_fv = -1;
 
                     await action_bind(i, bind_name);
                     await render();
@@ -171,7 +172,7 @@ function render_player(playerdata, left, is_you) {
         if (e.target === player || e.target == stats || e.target == deck) {
 
             clstate.selected_deck = null;
-            clstate.binding_fv = false;
+            clstate.binding_fv = -1;
 
             await render();
         }
