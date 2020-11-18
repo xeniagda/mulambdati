@@ -2,6 +2,7 @@ from expr import LambdaTerm, Abstraction, Application, Symbol, Variable, make_ch
 from monad_io import MonadIOAction, MonadIOLayout
 from player import Player
 import asyncio
+import traceback
 from token_gen import make_random_token
 
 class Combinator:
@@ -28,11 +29,15 @@ class Game:
         self.combinators.append(Combinator(name, price, term))
 
     async def start_game(self):
-        tasks = []
-        tasks.append(self.mana_loop())
-        tasks.extend([self.start_player(i) for i in range(len(self.players))])
+        try:
+            tasks = []
+            tasks.append(self.mana_loop())
+            tasks.extend([self.start_player(i) for i in range(len(self.players))])
 
-        await asyncio.gather(*tasks)
+            await asyncio.gather(*tasks)
+        except Exception as e:
+            traceback.print_exc()
+            return
 
     async def mana_loop(self):
         while True:
