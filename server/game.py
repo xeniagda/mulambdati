@@ -80,7 +80,7 @@ def make_standard_game(player1_const, player2_const):
 
     Identity = Abstraction("x", Variable("x"))
 
-    def pure(x, *, _game, _player_idx):
+    def pure(x, *, game, player_idx):
         return x
 
     action_pure = MonadIOAction("pure", ['x'], pure)
