@@ -99,6 +99,10 @@ h3 {
     margin: 1em;
     padding: 0.5em;
     border-radius: 0.5em;
+    cursor: pointer;
+}
+.combinator:active {
+    background: yellow !important;
 }
 
 .comb-heading {
@@ -107,8 +111,17 @@ h3 {
     justify-content: space-between;
 }
 
-.comb-heading :nth-child(1) {
-    width: 2em;
+.comb-heading > * {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+.comb-heading :first-child {
+    margin-left: 0;
+}
+
+.comb-heading :last-child {
+    margin-right: 0;
 }
 
 .comb-description {
