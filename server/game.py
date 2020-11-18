@@ -111,7 +111,7 @@ def make_standard_game(player1_const, player2_const):
 
     def get_opponent_health(*, game, player_idx):
         tok = game.players[player_idx].sec_token
-        logging.ingo(f"Player {tok} gets opponents health!")
+        logging.info(f"Player {tok} gets opponents health!")
         return Symbol(game.players[~player_idx].health)
 
     action_goh = MonadIOAction("get_opponent_health", [], get_opponent_health)
