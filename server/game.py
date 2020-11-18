@@ -45,6 +45,7 @@ class Game:
         await self.players[player_idx].update_state(self)
         while True:
             action = await self.players[player_idx].get_action()
+            print("Player", self.players[player_idx].sec_token, "doing", action)
 
             price = action.get_price(self)
             if self.players[player_idx].mana < price:

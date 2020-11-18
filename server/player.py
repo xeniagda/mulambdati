@@ -44,7 +44,7 @@ class ExternalPlayer(Player):
         return await self.action_queue.get()
 
     async def tell_msg(self, msg):
-        self.msg_list.append((make_random_token(), action))
+        self.msg_list.append((make_random_token(), msg))
 
     async def put_action(self, action):
         await self.action_queue.put(action)
@@ -54,7 +54,7 @@ class ExternalPlayer(Player):
             "health": self.health,
             "mana": self.mana,
             "deck": [term.to_json_obj() for term in self.deck],
-            "msg_list": [{"id": rid, "msg": msg} for id, msg in self.msg_list]
+            "msg_list": [{"id": rid, "msg": msg} for rid, msg in self.msg_list]
         }
 
 class ConsolePlayer(Player):
