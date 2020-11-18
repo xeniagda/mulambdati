@@ -5,10 +5,6 @@ function element_with_class_and_text(tag, className, content) {
     return element;
 }
 
-function render_lambda_expression(lambda_expr) {
-    return element_with_class_and_text("span", "", "λa .`c  (???) what");
-}
-
 function render_player(playerdata, left, is_you) {
     function punctuate(word, punct) {
         return left ? word + punct : punct + word;
@@ -35,7 +31,7 @@ function render_player(playerdata, left, is_you) {
     var deck = element_with_class_and_text("div", "deck", "");
     for (var i = 0; i < playerdata.deck.length; i++) {
         let term = playerdata.deck[i];
-        let rendered = render_lambda_expression();
+        let rendered = element_with_class_and_text("div", "term", term.rendered);
         let card = element_with_class_and_text("div", "card", "");
         if (clstate.selected_deck == i) {
             card.classList.add("card-selected");
