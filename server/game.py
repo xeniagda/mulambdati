@@ -5,6 +5,8 @@ import asyncio
 import traceback
 from token_gen import make_random_token
 
+import logging
+
 class Combinator:
     def __init__(self, name, price, term):
         self.name = name
@@ -50,7 +52,7 @@ class Game:
         await self.players[player_idx].update_state(self)
         while True:
             action = await self.players[player_idx].get_action()
-            print("Player", self.players[player_idx].sec_token, "doing", action)
+            logging.info(f"Player {self.players[player_idx].sec_token} doing {action}")
 
             price = action.get_price(self)
             if self.players[player_idx].mana < price:
@@ -86,21 +88,30 @@ def make_standard_game(player1_const, player2_const):
     action_pure = MonadIOAction("pure", ['x'], pure)
 
     def give_mana(*, game, player_idx):
-        print(f"Player {player_idx} gained 10 mana!")
+        tok = game.players[player_idx].sec_token
+        logging.info(f"Player {tok} gained 10 mana!")
         game.players[player_idx].mana += 10
         return Identity
 
     action_give_mana = MonadIOAction("give_10_mana", [], give_mana)
 
     def do_damage(x, *, game, player_idx):
-        print(f"Player {player_idx} dealt {x.name} damage!")
-        game.players[~player_idx].health -= x.name
+        tok = game.players[player_idx].sec_token
+        otok = game.players[~player_idx].sec_token
+        logging.info(f"Player {tok} dealt {x.name} damage to {otok}!")
+        if type(x.name) == int:
+            game.players[~player_idx].health -= x.name
+        else:
+            logging.info(f"Invalid type!")
+            # await self.players[player_idx].tell_msg(f"do_damage needs an int, you gave {type(x.name)}")
+
         return Identity
 
     action_do_damage = MonadIOAction("do_damage", ['x'], do_damage)
 
     def get_opponent_health(*, game, player_idx):
-        print(f"Player {player_idx} gets opponents health!")
+        tok = game.players[player_idx].sec_token
+        logging.ingo(f"Player {tok} gets opponents health!")
         return Symbol(game.players[~player_idx].health)
 
     action_goh = MonadIOAction("get_opponent_health", [], get_opponent_health)

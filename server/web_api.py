@@ -6,6 +6,20 @@ import traceback
 import json
 from action import *
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("web.log"),
+        logging.StreamHandler()
+    ]
+)
+
+
+logging.info("started")
+
 def make_json_response(data, status=200):
     return web.Response(
         body=json.dumps(data),
@@ -25,7 +39,7 @@ def pl_fn(*, find_player, read_data, expects=None):
                         if key not in data:
                             return make_json_response({"expected": expects, "missing": key}, status=400)
                 except Exception as e:
-                    print("JSON decode error:", e)
+                    logging.warning("JSON decode error:", e)
                     return make_json_response({"error": "invalid json!"}, status=400)
 
             if find_player:
@@ -78,7 +92,7 @@ class GameState:
         self.game_futures = []
 
     def add_new_game(self):
-        print("Making new game")
+        logging.info("Making new game")
         game, p1, p2 = make_standard_game(ExternalPlayer, ExternalPlayer)
         self.games_in_progress.append(game)
         self.unclaimed_tokens.add(p1)
@@ -87,6 +101,7 @@ class GameState:
         asyncio.run_coroutine_threadsafe(game.start_game(), asyncio.get_running_loop())
 
     def claim_unclaimed_token(self):
+        logging.info("User claiming token")
         if len(self.unclaimed_tokens) == 0:
             self.add_new_game()
 
@@ -119,7 +134,7 @@ class GameState:
         return resp
 
     def run(self):
-        web.run_app(self.app)
+        web.run_app(self.app, access_log=False)
 
     @pl_fn(find_player=True, read_data=True, expects=["combinator_idx"])
     async def action_purchase_combinator(self, i, game, data):
@@ -151,4 +166,7 @@ class GameState:
 app = web.Application()
 
 GAME_STATE = GameState(app)
+
+logging.getLogger('asyncio').setLevel(logging.WARNING)
+
 GAME_STATE.run()
