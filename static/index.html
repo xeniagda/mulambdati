@@ -86,6 +86,10 @@ h3 {
     background: var(--col-back-fv);
 }
 
+.flash-red {
+    background: red;
+}
+
 #fv-name {
     width: 3em;
     font-size: 16px;
@@ -101,7 +105,12 @@ h3 {
     border-radius: 0.5em;
     cursor: pointer;
 }
-.combinator:active {
+
+.combinator:active:not(#free-variable) {
+    background: yellow !important;
+}
+
+.combinator.clicked#free-variable {
     background: yellow !important;
 }
 

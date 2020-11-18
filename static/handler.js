@@ -73,3 +73,17 @@ async function action_purchase_combinator(c_idx) {
     await read_state();
     await render();
 }
+
+async function action_purchase_fv(fv_name) {
+    await fetch('/api/action/purchase_free_variable', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify( { "var_name": fv_name } )
+    });
+
+    await read_state();
+    await render();
+}

@@ -71,6 +71,23 @@ function render_combinators(combinatorsdata) {
         clstate.fv_name = e.target.value;
     };
 
+    free_variable.onmousedown = (e) => {
+        if (e.target == input) {
+            return;
+        }
+        if (clstate.fv_name == "") {
+            input.classList.add("flash-red");
+        } else {
+            free_variable.classList.add("clicked");
+            action_purchase_fv(clstate.fv_name);
+        }
+    };
+
+    free_variable.onmouseup = (e) => {
+        free_variable.classList.remove("clicked")
+        input.classList.remove("flash-red");
+    };
+
     input.id = "fv-name";
     input.type = "text";
     input.placeholder = "x";
