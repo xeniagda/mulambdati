@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from aiohttp import web
 from game import make_standard_game
 from player import ExternalPlayer
@@ -133,8 +134,8 @@ class GameState:
 
         return resp
 
-    def run(self):
-        web.run_app(self.app, access_log=False)
+    def run(self, port):
+        web.run_app(self.app, access_log=False, port=port)
 
     @pl_fn(find_player=True, read_data=True, expects=["combinator_idx"])
     async def action_purchase_combinator(self, i, game, data):
@@ -169,4 +170,7 @@ GAME_STATE = GameState(app)
 
 logging.getLogger('asyncio').setLevel(logging.WARNING)
 
-GAME_STATE.run()
+if len(sys.argv) == 2:
+    GAME_STATE.run(port=int(sys.argv[1]))
+else:
+    GAME_STATE.run(port=8080)
