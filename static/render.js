@@ -31,28 +31,39 @@ function render_player(playerdata, left, is_you) {
     var deck = element_with_class_and_text("div", "deck", "");
     for (var i = 0; i < playerdata.deck.length; i++) {
         let term = playerdata.deck[i];
-        let rendered = element_with_class_and_text("div", "term", term.rendered);
+
         let card = element_with_class_and_text("div", "card", "");
+        let rendered = element_with_class_and_text("div", "term", term.rendered);
         if (clstate.selected_deck == i) {
             card.classList.add("card-selected");
-            card.onclick = async (e) => {
+            card.onmousedown = async (e) => {
                 clstate.selected_deck = -1;
                 await render();
             };
+
+            card.appendChild(rendered);
+
+            var eval_button = element_with_class_and_text("div", "button", "eval");
+            eval_button.onmousedown = ((i) => async (e) => {
+                action_eval(i);
+            })(i);
+
+            card.appendChild(eval_button);
         } else {
-            card.onclick = ((i) => async (e) => {
+            card.onmousedown = ((i) => async (e) => {
                 if (clstate.selected_deck == -1) {
                     clstate.selected_deck = i;
                 } else {
                     let caller = clstate.selected_deck;
                     clstate.selected_deck = -1;
+                    await render();
                     await action_apply(caller, i);
                 }
                 await render();
             })(i);
+        card.appendChild(rendered);
         }
 
-        card.appendChild(rendered);
         deck.appendChild(card);
     }
 

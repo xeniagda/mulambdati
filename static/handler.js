@@ -101,3 +101,17 @@ async function action_apply(caller, callee) {
     await read_state();
     await render();
 }
+
+async function action_eval(idx) {
+    await fetch('/api/action/eval', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify( { "deck_idx": idx } )
+    });
+
+    await read_state();
+    await render();
+}

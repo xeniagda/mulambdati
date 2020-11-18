@@ -10,6 +10,8 @@ body {
     --col-back-you: #4a824e;
     --col-back-enemy: #BE6C17;
     --col-back-combinator: #74CCA3;
+    --col-term: #A95A3E;
+    --col-term-selected: #D39D58;
     --col-back-fv: #D9F5C4;
     --col-prim-1: #C9F1EB;
 
@@ -71,13 +73,40 @@ h3 {
     content: " (not you)";
 }
 
+.deck {
+    display: flex;
+    flex-direction: column;
+}
+
+#player-1 > .deck {
+    align-items: flex-start;
+}
+
+#player-2 > .deck {
+    align-items: flex-end;
+}
+
 .card {
     margin-left: 1em;
     margin-right: 1em;
+    margin-bottom: 0.2em;
+    padding: 0.2em;
+    border-radius: 0.2em;
+    background: var(--col-term);
+    display: flex;
+    flex-direction: column;
 }
 
 .card-selected {
-    color: #999999;
+    background: var(--col-term-selected);
+}
+
+.button {
+    cursor: pointer;
+    background: var(--col-term);
+    margin: 0.2em;
+    padding: 0.2em;
+    border-radius: 0.2em;
 }
 
 #combinators {
