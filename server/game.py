@@ -80,7 +80,7 @@ def make_standard_game(player1_const, player2_const):
     pl1 = player1_const(pl1_token, 10, 0)
     pl2 = player2_const(pl2_token, 10, 0)
 
-    Identity = Abstraction("x", Variable("x"))
+    Identity = lambda: Abstraction("x", Variable("x"))
 
     def pure(x, *, game, player_idx):
         return x
@@ -91,7 +91,7 @@ def make_standard_game(player1_const, player2_const):
         tok = game.players[player_idx].sec_token
         logging.info(f"Player {tok} gained 10 mana!")
         game.players[player_idx].mana += 10
-        return Identity
+        return Identity()
 
     action_give_mana = MonadIOAction("give_10_mana", [], give_mana)
 
@@ -105,7 +105,7 @@ def make_standard_game(player1_const, player2_const):
             logging.info(f"Invalid type!")
             # await self.players[player_idx].tell_msg(f"do_damage needs an int, you gave {type(x.name)}")
 
-        return Identity
+        return Identity()
 
     action_do_damage = MonadIOAction("do_damage", ['x'], do_damage)
 
