@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import random
+import uuid
 
 letters = "abcdefghijklmnopqrstuvwxyz"
 def n_to_base(n, base):
@@ -44,7 +45,7 @@ class StringifyMode:
 
 class LambdaTerm(ABC):
     def __init__(self):
-        self.id = hex(random.randrange(0, 1 << 32))
+        self.id = str(uuid.uuid4())
 
     @abstractmethod
     def clone(self):
