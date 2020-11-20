@@ -1,4 +1,5 @@
 import random
 
+words = open("/usr/share/dict/words", "r").read().split("\n")
 def make_random_token():
-    return "apio" + str(random.randrange(0, 2<<32))
+    return "apio" + random.choice(words) + random.choice(words)

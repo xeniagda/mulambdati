@@ -111,13 +111,13 @@ class GameState:
         )
 
     def claim_unclaimed_token(self):
-        logging.info("User claiming token")
         if len(self.unclaimed_tokens) == 0:
             self.add_new_game()
 
         unclaimed_token = list(self.unclaimed_tokens)[0]
         self.unclaimed_tokens.remove(unclaimed_token)
 
+        logging.info(f"User claiming token {unclaimed_token}")
         return unclaimed_token
 
     # Gives (i, game) where game.players[i].sec_token == sec_token
