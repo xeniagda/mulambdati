@@ -29,6 +29,13 @@ class Game:
 
         self.game_identifier = game_identifier
 
+    def player_with_token(self, token):
+        for i, pl in enumerate(self.players):
+            if pl.sec_token == token:
+                return i
+
+        return None
+
     def add_combinator(self, price, name, term):
         self.combinators.append(Combinator(name, price, term))
 
