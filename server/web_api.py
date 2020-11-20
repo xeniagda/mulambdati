@@ -21,6 +21,14 @@ logging.basicConfig(
 
 logging.info("started")
 
+def verify_username(name):
+    if len(name) > 40:
+        return False
+    if '\x1b' in name: # No escape codes!
+        return False
+
+    return True
+
 def make_json_response(data, status=200):
     return web.Response(
         body=json.dumps(data),
@@ -159,6 +167,9 @@ class GameState:
             return make_json_response({"error": "invalid player_idx"}, status=400)
 
         if type(data["name"]) == str:
+            if not verify_username(data["name"]):
+                return make_json_response({"error": "name does not meet rules"}, status=400)
+
             sec_token = await pl.claim(data["name"])
             if sec_token == None:
                 return make_json_response({"error": "player already claimed"}, status=400)
