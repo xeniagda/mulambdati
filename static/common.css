@@ -1,0 +1,21 @@
+body {
+    --col-back-1: #060721;
+    --col-back-you: #4a824e;
+    --col-back-enemy: #BE6C17;
+    --col-back-combinator: #74CCA3;
+    --col-term: #A95A3E;
+    --col-term-selected: #D39D58;
+    --col-back-fv: #D9F5C4;
+    --col-prim-1: #C9F1EB;
+
+    font-family: monospace;
+    background: var(--col-back-1);
+    color: var(--col-prim-1);
+    font-size: 15px;
+}
+
+h3 {
+    margin: 0px;
+}
+
+
