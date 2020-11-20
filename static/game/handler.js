@@ -150,6 +150,3 @@ async function action_bind(idx, name) {
     await render();
 }
 
-document.getElementById("new-game").onclick = (e) => {
-    document.cookie = "sec_token=";
-}
