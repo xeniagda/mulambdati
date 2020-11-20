@@ -28,9 +28,11 @@ def make_json_response(data, status=200):
         status=status,
     )
 
-def pl_fn(*, find_player, read_data, expects=None):
+def pl_fn(*, find_game, find_player, read_data, expects=None):
     if not read_data and expects is not None:
         raise ValueError("read_data = False, expects != None")
+    if find_player and not find_game:
+        raise ValueError("find_player = True, but find_game = False!")
     def decorator(f):
         async def inner(self, req):
             if read_data:
@@ -43,23 +45,35 @@ def pl_fn(*, find_player, read_data, expects=None):
                     logging.warning("JSON decode error:", e)
                     return make_json_response({"error": "invalid json!"}, status=400)
 
+            if find_game:
+                if "game_id" in req.query:
+                    game_id = req.query["game_id"]
+                else:
+                    # TODO: maybe give a default id? reroute to /lobby?
+                    return make_json_response({"error": "missing game_id"}, status=400)
+
+                game = self.get_game(game_id)
+                if game is None:
+                    return make_json_response({"error": "no such game!"}, status=400)
+
             if find_player:
                 if not 'sec_token' in req.cookies:
-                    return make_json_response({"error": "sec_token required"}, status=400)
+                    return make_json_response({"error": "missing sec_token"}, status=400)
 
-                idx_game = self.get_state_for_player(req.cookies['sec_token'])
-                if idx_game is None:
+                idx = game.player_with_token(req.cookies["sec_token"])
+
+                if idx is None:
                     resp = make_json_response({"error": "no such token"}, status=400)
                     resp.del_cookie("sec_token")
 
                     return resp
 
-                idx, game = idx_game
-
             args = []
 
             if find_player:
-                args.extend([idx, game])
+                args.append(idx)
+            if find_game:
+                args.append(game)
             if read_data:
                 args.append(data)
 
@@ -83,6 +97,7 @@ class GameState:
         app.router.add_get("/", self.index)
 
         app.router.add_get("/api/state", self.get_state)
+        app.router.add_get("/api/get_games", self.get_games)
         app.router.add_post("/api/join_game", self.join_game)
         app.router.add_post("/api/action/purchase_combinator", self.action_purchase_combinator)
         app.router.add_post("/api/action/purchase_free_variable", self.action_purchase_free_variable)
@@ -105,7 +120,7 @@ class GameState:
 
     async def index(self, req):
         return web.Response(
-            body=open("../static/index.html", "r").read(),
+            body=open("../static/lobby.html", "r").read(),
             content_type='text/html',
             status=200,
         )
@@ -120,19 +135,23 @@ class GameState:
         logging.info(f"User claiming token {unclaimed_token}")
         return unclaimed_token
 
-    # Gives (i, game) where game.players[i].sec_token == sec_token
-    def get_state_for_player(self, sec_token):
+    # Gives game or None
+    def get_game(self, game_id):
         for game in self.games_in_progress:
-            for i, pl in enumerate(game.players):
-                if pl.sec_token == sec_token:
-                    return (i, game)
+            if game.game_identifier == game_id:
+                return game
 
         return None
 
-    @pl_fn(find_player=True, read_data=False)
-    async def get_state(self, i, game):
+    @pl_fn(find_game=False, find_player=False, read_data=False)
+    async def get_games(self):
         return {
-            "you_are": i,
+            "games": [game.to_json_obj() for game in self.games_in_progress]
+        }
+
+    @pl_fn(find_game=True, find_player=False, read_data=False)
+    async def get_state(self, game):
+        return {
             "game": game.to_json_obj()
         }
 
@@ -146,28 +165,28 @@ class GameState:
     def run(self, port):
         web.run_app(self.app, access_log=False, port=port)
 
-    @pl_fn(find_player=True, read_data=True, expects=["combinator_idx"])
+    @pl_fn(find_game=True, find_player=True, read_data=True, expects=["combinator_idx"])
     async def action_purchase_combinator(self, i, game, data):
         await game.players[i].put_action(PurchaseCombinator(data["combinator_idx"]))
         return {}
 
 
-    @pl_fn(find_player=True, read_data=True, expects=["var_name"])
+    @pl_fn(find_game=True, find_player=True, read_data=True, expects=["var_name"])
     async def action_purchase_free_variable(self, i, game, data):
         await game.players[i].put_action(PurchaseFreeVariable(data["var_name"]))
         return {}
 
-    @pl_fn(find_player=True, read_data=True, expects=["bind_name", "deck_idx"])
+    @pl_fn(find_game=True, find_player=True, read_data=True, expects=["bind_name", "deck_idx"])
     async def action_bind_variable(self, i, game, data):
         await game.players[i].put_action(BindVariable(data["bind_name"], data["deck_idx"]))
         return {}
 
-    @pl_fn(find_player=True, read_data=True, expects=["caller_idx", "callee_idx"])
+    @pl_fn(find_game=True, find_player=True, read_data=True, expects=["caller_idx", "callee_idx"])
     async def action_apply(self, i, game, data):
         await game.players[i].put_action(Apply(data["caller_idx"], data["callee_idx"]))
         return {}
 
-    @pl_fn(find_player=True, read_data=True, expects=["deck_idx"])
+    @pl_fn(find_game=True, find_player=True, read_data=True, expects=["deck_idx"])
     async def action_eval(self, i, game, data):
         await game.players[i].put_action(Eval(data["deck_idx"]))
         return {}
