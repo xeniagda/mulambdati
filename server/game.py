@@ -21,11 +21,13 @@ class Combinator:
         }
 
 class Game:
-    def __init__(self, players, layout):
+    def __init__(self, game_identifier, players, layout):
         self.players = players
 
         self.layout = layout
         self.combinators = []
+
+        self.game_identifier = game_identifier
 
     def add_combinator(self, price, name, term):
         self.combinators.append(Combinator(name, price, term))
@@ -68,6 +70,7 @@ class Game:
 
     def to_json_obj(self):
         return {
+            "game_identifier": self.game_identifier,
             "players": [player.to_json_obj() for player in self.players],
             "layout": self.layout.to_json_obj(),
             "combinators": [comb.to_json_obj() for comb in self.combinators],
@@ -119,6 +122,7 @@ def make_standard_game(player1_const, player2_const):
     layout = MonadIOLayout([action_pure, action_give_mana, action_do_damage, action_goh])
 
     game = Game(
+        make_random_token(),
         [pl1, pl2],
         layout,
     )
