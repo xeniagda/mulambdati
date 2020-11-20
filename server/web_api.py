@@ -70,7 +70,7 @@ def pl_fn(*, find_game, find_player, read_data, expects=None):
 
                 idx = game.player_with_token(req.cookies["sec_token"])
 
-                if idx is None:
+                if idx is None and find_player != "noerror":
                     resp = make_json_response({"error": "no such token"}, status=400)
                     resp.del_cookie("sec_token")
 
@@ -182,10 +182,11 @@ class GameState:
         else:
             return make_json_response({"error": "invalid name"}, status=400)
 
-    @pl_fn(find_game=True, find_player=False, read_data=False)
-    async def get_state(self, game):
+    @pl_fn(find_game=True, find_player='noerror', read_data=False)
+    async def get_state(self, i, game):
         return {
-            "game": game.to_json_obj()
+            "game": game.to_json_obj(),
+            "you_are": i,
         }
 
     def run(self, port):
