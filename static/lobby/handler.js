@@ -67,6 +67,9 @@ async function render_game(i, gamedata) {
     } else {
         game.appendChild(document.createTextNode("this game is "));
         game.appendChild(element_with_class_and_text("span", "user", "full"));
+        game.appendChild(document.createTextNode(" but you can still "));
+        game.appendChild(element_with_class_and_text("span", "user", "spectate"));
+        game.appendChild(document.createTextNode("!"));
         game.classList.add("full");
     }
 
