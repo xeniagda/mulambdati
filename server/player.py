@@ -68,11 +68,12 @@ class ExternalPlayer(Player):
         return orig
 
     # Claims this user, returning the sec_token if successful, None otherwise
-    async def claim(self):
+    async def claim(self, name):
         if self.has_been_claimed:
             return None
 
         self.has_been_claimed = True
+        self.user_name = name
         return self.sec_token
 
 class ConsolePlayer(Player):
