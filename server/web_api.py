@@ -50,7 +50,7 @@ def pl_fn(*, find_game, find_player, read_data, expects=None):
                         if key not in data:
                             return make_json_response({"expected": expects, "missing": key}, status=400)
                 except Exception as e:
-                    logging.warning("JSON decode error:", e)
+                    logging.warning(f"JSON decode error: {e}")
                     return make_json_response({"error": "invalid json!"}, status=400)
 
             if find_game:
