@@ -13,10 +13,18 @@
 }
 
 .game {
-    background: var(--col-back-enemy);
+    background: var(--col-back-you);
     margin: 1em;
     padding: 0.5em;
     border-radius: 0.5em;
+}
+
+.game.full {
+    background: var(--col-back-enemy);
+}
+
+.game.your {
+    border: 2px solid var(--col-prim-2);
 }
 
 .user {
@@ -40,7 +48,7 @@
             <br/>
             <span class="name"> apioamplificationsubstitution </span>
             <br/>
-            <span class="n_players"> (1/2), <span class="user">coral</span> is waiting </span>
+            <span class="n_players"> (1/2)</span>, <span class="user">coral</span> is waiting
             <br/>
             <a href="game.html?game_id=apioamplificationsubstitution"> Join! </a>
         </div>
@@ -51,4 +59,8 @@
 </h1>
 
 </body>
+
+<script src="common.js"></script>
+<script src="lobby/handler.js"></script>
+
 </html>
