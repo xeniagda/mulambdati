@@ -1,10 +1,3 @@
-function element_with_class_and_text(tag, className, content) {
-    var element = document.createElement(tag);
-    element.className = className;
-    element.innerText = content;
-    return element;
-}
-
 function render_player(playerdata, left, is_you) {
     function punctuate(word, punct) {
         return left ? word + punct : punct + word;
