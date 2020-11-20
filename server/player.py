@@ -45,6 +45,9 @@ class ExternalPlayer(Player):
         self.action_queue = asyncio.Queue()
         self.msg_list = [] # (random id, msg), id filtered by the client
 
+        self.has_been_claimed = False
+        self.user_name = None
+
     async def update_state(self, game):
         self.current_state = game
 
@@ -60,7 +63,17 @@ class ExternalPlayer(Player):
     def to_json_obj(self):
         orig = super().to_json_obj()
         orig["msg_list"] = [{"id": rid, "msg": msg} for rid, msg in self.msg_list]
+        orig["has_been_claimed"] = self.has_been_claimed
+        orig["user_name"] = self.user_name
         return orig
+
+    # Claims this user, returning the sec_token if successful, None otherwise
+    async def claim(self):
+        if self.has_been_claimed:
+            return None
+
+        self.has_been_claimed = True
+        return self.sec_token
 
 class ConsolePlayer(Player):
     def __init__(self, sec_token, health, mana, f_in, f_out):
