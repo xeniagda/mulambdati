@@ -98,7 +98,7 @@ class GameState:
 
         app.router.add_get("/api/state", self.get_state)
         app.router.add_get("/api/get_games", self.get_games)
-        app.router.add_post("/api/join_game", self.join_game)
+        app.router.add_post("/api/create_new_game", self.create_new_game)
         app.router.add_post("/api/action/purchase_combinator", self.action_purchase_combinator)
         app.router.add_post("/api/action/purchase_free_variable", self.action_purchase_free_variable)
         app.router.add_post("/api/action/bind_variable", self.action_bind_variable)
@@ -108,15 +108,6 @@ class GameState:
         app.router.add_static("/", '../static')
 
         self.game_futures = []
-
-    def add_new_game(self):
-        logging.info("Making new game")
-        game, p1, p2 = make_standard_game(ExternalPlayer, ExternalPlayer)
-        self.games_in_progress.append(game)
-        self.unclaimed_tokens.add(p1)
-        self.unclaimed_tokens.add(p2)
-
-        asyncio.run_coroutine_threadsafe(game.start_game(), asyncio.get_running_loop())
 
     async def index(self, req):
         return web.Response(
@@ -149,18 +140,22 @@ class GameState:
             "games": [game.to_json_obj() for game in self.games_in_progress]
         }
 
+    @pl_fn(find_game=False, find_player=False, read_data=False)
+    async def create_new_game(self):
+        game, _p1, _p2 = make_standard_game(ExternalPlayer, ExternalPlayer)
+        self.games_in_progress.append(game)
+
+        asyncio.run_coroutine_threadsafe(game.start_game(), asyncio.get_running_loop())
+
+        logging.info(f"Created new game with name {game.game_identifier}")
+        return {"created_id": game.game_identifier}
+
+
     @pl_fn(find_game=True, find_player=False, read_data=False)
     async def get_state(self, game):
         return {
             "game": game.to_json_obj()
         }
-
-    async def join_game(self, req):
-        tok = self.claim_unclaimed_token()
-        resp = web.Response()
-        resp.set_cookie("sec_token", tok)
-
-        return resp
 
     def run(self, port):
         web.run_app(self.app, access_log=False, port=port)
