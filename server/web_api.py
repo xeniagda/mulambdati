@@ -81,6 +81,7 @@ class GameState:
         self.app = app
 
         app.router.add_get("/", self.index)
+        app.router.add_get("/light.html", self.light)
 
         app.router.add_get("/api/state", self.get_state)
         app.router.add_post("/api/join_game", self.join_game)
@@ -106,6 +107,13 @@ class GameState:
     async def index(self, req):
         return web.Response(
             body=open("../static/index.html", "r").read(),
+            content_type='text/html',
+            status=200,
+        )
+
+    async def light(self, req):
+        return web.Response(
+            body=open("../static/light.html", "r").read(),
             content_type='text/html',
             status=200,
         )
