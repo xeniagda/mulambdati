@@ -1,12 +1,23 @@
+const game_id = new URLSearchParams(window.location.search).get('game_id');
+
+if (game_id === null) {
+    window.location.href = "/lobby.html";
+}
+
+function mkrq(path) {
+    const searchParams = new URLSearchParams({"game_id": game_id});
+    return path + "?" + searchParams.toString();
+}
+
 
 async function join_if_needed() {
-    let state = await fetch('/api/state', {
+    let state = await fetch(mkrq('/api/state'), {
         method: 'GET',
         credentials: 'same-origin',
     });
 
     if (state.status == 400) {
-        await fetch('/api/join_game', {
+        await fetch(mkrq('/api/join_game'), {
             method: 'POST',
             credentials: 'same-origin',
         });
@@ -26,7 +37,7 @@ var data;
 async function read_state() {
     await join_if_needed();
 
-    let resp = await fetch('/api/state', {
+    let resp = await fetch(mkrq('/api/state'), {
         method: 'GET',
         credentials: 'same-origin',
     });
@@ -70,7 +81,7 @@ render_loop();
 
 
 async function action_purchase_combinator(c_idx) {
-    await fetch('/api/action/purchase_combinator', {
+    await fetch(mkrq('/api/action/purchase_combinator'), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -84,7 +95,7 @@ async function action_purchase_combinator(c_idx) {
 }
 
 async function action_purchase_fv(fv_name) {
-    await fetch('/api/action/purchase_free_variable', {
+    await fetch(mkrq('/api/action/purchase_free_variable'), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -98,7 +109,7 @@ async function action_purchase_fv(fv_name) {
 }
 
 async function action_apply(caller, callee) {
-    await fetch('/api/action/apply', {
+    await fetch(mkrq('/api/action/apply'), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -112,7 +123,7 @@ async function action_apply(caller, callee) {
 }
 
 async function action_eval(idx) {
-    await fetch('/api/action/eval', {
+    await fetch(mkrq('/api/action/eval'), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -126,7 +137,7 @@ async function action_eval(idx) {
 }
 
 async function action_bind(idx, name) {
-    await fetch('/api/action/bind_variable', {
+    await fetch(mkrq('/api/action/bind_variable'), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
