@@ -66,15 +66,18 @@ def pl_fn(*, find_game, find_player, read_data, expects=None):
 
             if find_player:
                 if not 'sec_token' in req.cookies:
-                    return make_json_response({"error": "missing sec_token"}, status=400)
+                    if find_player == 'noerror':
+                        idx = None
+                    else:
+                        return make_json_response({"error": "missing sec_token"}, status=400)
+                else:
+                    idx = game.player_with_token(req.cookies["sec_token"])
 
-                idx = game.player_with_token(req.cookies["sec_token"])
+                    if idx is None and find_player != "noerror":
+                        resp = make_json_response({"error": "no such token"}, status=400)
+                        resp.del_cookie("sec_token")
 
-                if idx is None and find_player != "noerror":
-                    resp = make_json_response({"error": "no such token"}, status=400)
-                    resp.del_cookie("sec_token")
-
-                    return resp
+                        return resp
 
             args = []
 
