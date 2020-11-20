@@ -1,5 +1,10 @@
 from expr import LambdaTerm, Abstraction, Application, Symbol, Variable, Opaque, make_chnum
 
+class InvalidMonadException(Exception):
+    def __init__(self, evaled):
+        super(InvalidMonadException, self).__init__()
+        self.evaled = evaled
+
 class MonadIOAction:
     def __init__(self, name, arg_names, run):
         self.symb = Symbol(name)
@@ -29,6 +34,11 @@ class MonadIOAction:
             "symb": self.symb.name,
             "arg_names": self.arg_names,
         }
+
+    def __str__(self):
+        return f"MonadIOAction(symb={self.symb}, arg_names={self.arg_names})"
+
+    __repr__ = __str__
 
 class BindAction(MonadIOAction):
     def __init__(self):
@@ -81,8 +91,10 @@ def eval_monad_io(layout, term, **kwargs):
     monad_res = layout.apply_monad(term).whnf(force_opaques=True)
 
     matched = layout.match_monad_result(monad_res)
+    print(matched)
+
     if matched is None:
-        return monad_res
+        raise InvalidMonadException(matched)
     else:
         action, args = matched
 

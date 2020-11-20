@@ -1,6 +1,6 @@
 from expr import Application, Variable, Abstraction
 from abc import ABC, abstractmethod
-from monad_io import eval_monad_io
+from monad_io import eval_monad_io, InvalidMonadException
 
 class Action(ABC):
     def __init__(self, combinators, fvs, abstractions, deck_combine, eval_terms):
@@ -89,5 +89,9 @@ class Eval(Action):
     async def run(self, game, player_idx):
         player = game.players[player_idx]
 
-        term = eval_monad_io(game.layout, player.deck[self.deck_idx], game=game, player_idx=player_idx)
-        player.deck[self.deck_idx] = term.whnf()
+        try:
+            term = eval_monad_io(game.layout, player.deck[self.deck_idx], game=game, player_idx=player_idx)
+
+            player.deck[self.deck_idx] = term.whnf()
+        except InvalidMonadException:
+            await player.tell_msg("Invalid monad!")
