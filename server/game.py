@@ -36,6 +36,9 @@ class Game:
 
         return None
 
+    def all_players_claimed(self):
+        return all(p.has_been_claimed for p in self.players)
+
     def add_combinator(self, price, name, term):
         self.combinators.append(Combinator(name, price, term))
 
@@ -53,9 +56,10 @@ class Game:
     async def mana_loop(self):
         while True:
             await asyncio.sleep(1)
-            for pl in self.players:
-                pl.mana += 1
-                await pl.update_state(self)
+            if self.all_players_claimed():
+                for pl in self.players:
+                    pl.mana += 1
+                    await pl.update_state(self)
 
     async def start_player(self, player_idx):
         await self.players[player_idx].update_state(self)
