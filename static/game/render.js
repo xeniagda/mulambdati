@@ -14,6 +14,30 @@ function render_player(playerdata, left, is_you) {
 
     var stats = element_with_class_and_text("div", "stats", "");
     stats.appendChild(element_with_class_and_text("h3", "plname", "Player " + (1 + left)));
+
+    if (playerdata.has_been_claimed === false) {
+        stats.appendChild(element_with_class_and_text("p", "", "Unclaimed!"));
+        if (data.you_are === null) {
+            var claim_button = element_with_class_and_text("button", "", "Claim this player!");
+            claim_button.onclick = async e => {
+                let name = prompt("Your name?");
+                await fetch(mkrq('/api/join_game'), {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify( { "player_idx": 1 - left, "name": name } )
+                });
+            };
+            stats.appendChild(claim_button);
+            stats.appendChild(element_with_class_and_text("br", "", ""));
+        }
+    } else {
+        stats.appendChild(element_with_class_and_text("p", "", playerdata.user_name));
+    }
+
     stats.appendChild(document.createTextNode("Health: " + playerdata.health));
     stats.appendChild(element_with_class_and_text("br", "", ""));
     stats.appendChild(document.createTextNode("Mana: " + playerdata.mana + "𐌼"));
