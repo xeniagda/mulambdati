@@ -1,0 +1,54 @@
+<html>
+<head>
+
+<meta charset="UTF-8">
+    <link rel="stylesheet" href="common.css">
+
+    <style>
+
+#lobby {
+    display: flex;
+    flex-direction: row;
+    flex-flow: wrap;
+}
+
+.game {
+    background: var(--col-back-enemy);
+    margin: 1em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+}
+
+.user {
+    color: var(--col-prim-2);
+}
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>
+        helocm to multiplayer lambda calculus
+    </h1>
+
+    <h2> Join a game! </h2>
+    <div id="lobby">
+        <div class="game">
+            <h3> Game #1 </h3>
+            <br/>
+            <span class="name"> apioamplificationsubstitution </span>
+            <br/>
+            <span class="n_players"> (1/2), <span class="user">coral</span> is waiting </span>
+            <br/>
+            <a href="game.html?game_id=apioamplificationsubstitution"> Join! </a>
+        </div>
+    </div>
+
+    <h2> No games you join? <a id="create-new-game" href="#"> Make a new game! </a> </h2>
+
+</h1>
+
+</body>
+</html>
