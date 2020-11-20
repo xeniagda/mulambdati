@@ -99,6 +99,7 @@ class GameState:
         app.router.add_get("/api/state", self.get_state)
         app.router.add_get("/api/get_games", self.get_games)
         app.router.add_post("/api/create_new_game", self.create_new_game)
+        app.router.add_post("/api/join_game", self.join_game)
         app.router.add_post("/api/action/purchase_combinator", self.action_purchase_combinator)
         app.router.add_post("/api/action/purchase_free_variable", self.action_purchase_free_variable)
         app.router.add_post("/api/action/bind_variable", self.action_bind_variable)
@@ -150,6 +151,25 @@ class GameState:
         logging.info(f"Created new game with name {game.game_identifier}")
         return {"created_id": game.game_identifier}
 
+    @pl_fn(find_game=True, find_player=False, read_data=True, expects=["player_idx", "name"])
+    async def join_game(self, game, data):
+        try:
+            pl = game.players[data["player_idx"]]
+        except:
+            return make_json_response({"error": "invalid player_idx"}, status=400)
+
+        if type(data["name"]) == str:
+            sec_token = await pl.claim(data["name"])
+            if sec_token == None:
+                return make_json_response({"error": "player already claimed"}, status=400)
+            else:
+                logging.info(f"User sec_token={sec_token} claimed as {pl.user_name}")
+                resp = web.Response()
+                resp.set_cookie("sec_token", sec_token)
+
+                return resp
+        else:
+            return make_json_response({"error": "invalid name"}, status=400)
 
     @pl_fn(find_game=True, find_player=False, read_data=False)
     async def get_state(self, game):
