@@ -95,7 +95,7 @@ def pl_fn(*, find_game, find_player, read_data, expects=None, do_log=True):
                 if find_game:
                     log += f"Game = {game.game_identifier}"
                 if find_player and idx != None:
-                    log += f" as {game.players[idx].name}/{game.players[idx].sec_token}"
+                    log += f" as {game.players[idx].user_name}/{game.players[idx].sec_token}"
                 logging.info(log)
 
             resp = await f(self, *args)
