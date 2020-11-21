@@ -36,13 +36,15 @@ def make_json_response(data, status=200):
         status=status,
     )
 
-def pl_fn(*, find_game, find_player, read_data, expects=None):
+def pl_fn(*, find_game, find_player, read_data, expects=None, do_log=True):
     if not read_data and expects is not None:
         raise ValueError("read_data = False, expects != None")
     if find_player and not find_game:
         raise ValueError("find_player = True, but find_game = False!")
     def decorator(f):
+        nonlocal do_log
         async def inner(self, req):
+            nonlocal do_log
             if read_data:
                 try:
                     data = await req.json()
@@ -87,6 +89,14 @@ def pl_fn(*, find_game, find_player, read_data, expects=None):
                 args.append(game)
             if read_data:
                 args.append(data)
+
+            if do_log:
+                log = f"{req.remote} accessing {req.rel_url}. "
+                if find_game:
+                    log += f"Game = {game.game_identifier}"
+                if find_player and idx != None:
+                    log += f" as {game.players[idx].name}/{game.players[idx].sec_token}"
+                logging.info(log)
 
             resp = await f(self, *args)
             if isinstance(resp, web.Response):
@@ -146,7 +156,7 @@ class GameState:
 
         return None
 
-    @pl_fn(find_game=False, find_player=False, read_data=False)
+    @pl_fn(find_game=False, find_player=False, read_data=False, do_log=False)
     async def get_games(self):
         return {
             "games": [game.to_json_obj() for game in self.games_in_progress]
@@ -185,7 +195,7 @@ class GameState:
         else:
             return make_json_response({"error": "invalid name"}, status=400)
 
-    @pl_fn(find_game=True, find_player='noerror', read_data=False)
+    @pl_fn(find_game=True, find_player='noerror', read_data=False, do_log=False)
     async def get_state(self, i, game):
         return {
             "game": game.to_json_obj(),
