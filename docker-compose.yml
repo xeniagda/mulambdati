@@ -1,0 +1,9 @@
+version: "3"
+services:
+  mulambdati:
+    build: .
+    restart: on-failure
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+        - "4080:4080"
