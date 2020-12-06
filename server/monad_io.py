@@ -87,7 +87,7 @@ class MonadIOLayout:
         }
 
 # kwargs are passed into the inner action functions
-def eval_monad_io(layout, term, **kwargs):
+async def eval_monad_io(layout, term, **kwargs):
     monad_res = layout.apply_monad(term).whnf(force_opaques=True)
 
     matched = layout.match_monad_result(monad_res)
@@ -100,11 +100,11 @@ def eval_monad_io(layout, term, **kwargs):
 
         if isinstance(action, BindAction):
             # Special! y >>= x
-            y_res = eval_monad_io(layout, args[0], **kwargs).whnf()
+            y_res = await eval_monad_io(layout, args[0], **kwargs).whnf()
             x_applied = Application(args[1], y_res)
-            return eval_monad_io(layout, x_applied, **kwargs).whnf()
+            return await eval_monad_io(layout, x_applied, **kwargs).whnf()
 
-        res = action.run(*args, **kwargs)
+        res = await action.run(*args, **kwargs)
         return res
 
 def _make_standard_io_layout():

@@ -96,12 +96,12 @@ def make_standard_game(player1_const, player2_const):
 
     Identity = lambda: Abstraction("x", Variable("x"))
 
-    def pure(x, *, game, player_idx):
+    async def pure(x, *, game, player_idx):
         return x
 
     action_pure = MonadIOAction("pure", ['x'], pure)
 
-    def give_mana(*, game, player_idx):
+    async def give_mana(*, game, player_idx):
         tok = game.players[player_idx].sec_token
         logging.info(f"Player {tok} gained 10 mana!")
         game.players[player_idx].mana += 10
@@ -109,7 +109,7 @@ def make_standard_game(player1_const, player2_const):
 
     action_give_mana = MonadIOAction("give_10_mana", [], give_mana)
 
-    def do_damage(x, *, game, player_idx):
+    async def do_damage(x, *, game, player_idx):
         tok = game.players[player_idx].sec_token
         otok = game.players[~player_idx].sec_token
         logging.info(f"Player {tok} dealt {x.name} damage to {otok}!")
@@ -123,7 +123,7 @@ def make_standard_game(player1_const, player2_const):
 
     action_do_damage = MonadIOAction("do_damage", ['x'], do_damage)
 
-    def get_opponent_health(*, game, player_idx):
+    async def get_opponent_health(*, game, player_idx):
         tok = game.players[player_idx].sec_token
         logging.info(f"Player {tok} gets opponents health!")
         return Symbol(game.players[~player_idx].health)

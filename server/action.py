@@ -90,7 +90,12 @@ class Eval(Action):
         player = game.players[player_idx]
 
         try:
-            term = eval_monad_io(game.layout, player.deck[self.deck_idx], game=game, player_idx=player_idx)
+            term = await eval_monad_io(
+                game.layout,
+                player.deck[self.deck_idx],
+                game=game,
+                player_idx=player_idx
+            )
 
             player.deck[self.deck_idx] = term.whnf()
         except InvalidMonadException:
