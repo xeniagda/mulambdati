@@ -1,7 +1,7 @@
 var created_games = new Set();
 
 async function load_and_render_games() {
-    let games = await fetch('/api/get_games');
+    let games = await fetch('/api/get_games', { "method": "POST" });
     let data = await games.json();
 
     var lobby = document.getElementById("lobby");

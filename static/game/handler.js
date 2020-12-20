@@ -12,15 +12,11 @@ function mkrq(path) {
 
 async function join_if_needed() {
     let state = await fetch(mkrq('/api/state'), {
-        method: 'GET',
-        credentials: 'same-origin',
+        method: 'POST',
     });
 
     if (state.status == 400) {
-        await fetch(mkrq('/api/join_game'), {
-            method: 'POST',
-            credentials: 'same-origin',
-        });
+        await do_req('/api/join_game');
     }
 }
 
@@ -32,16 +28,30 @@ var clstate = {
     "fv_name": "",
 };
 
+async function do_req(url, data) {
+    data['sec_token'] = localStorage.getItem("sec_token");
+    json_res = await (await fetch(mkrq(url), {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify( data )
+    })).json();
+
+    if (json_res["new_sec_token"] !== undefined) {
+        localStorage.setItem("sec_token", json_res["new_sec_token"]);
+    }
+
+    return json_res;
+}
+
 var data;
 
 async function read_state() {
     await join_if_needed();
 
-    let resp = await fetch(mkrq('/api/state'), {
-        method: 'GET',
-        credentials: 'same-origin',
-    });
-    data = await resp.json();
+    data = await do_req('api/state', {});
 }
 
 async function render(last_data) {
@@ -81,70 +91,35 @@ render_loop();
 
 
 async function action_purchase_combinator(c_idx) {
-    await fetch(mkrq('/api/action/purchase_combinator'), {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify( { "combinator_idx": c_idx } )
-    });
+    await do_req('api/action/purchase_combinator', { "combinator_idx": c_idx });
 
     await read_state();
     await render();
 }
 
 async function action_purchase_fv(fv_name) {
-    await fetch(mkrq('/api/action/purchase_free_variable'), {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify( { "var_name": fv_name } )
-    });
+    await do_req('api/action/purchase_free_variable', { "var_name": fv_name });
 
     await read_state();
     await render();
 }
 
 async function action_apply(caller, callee) {
-    await fetch(mkrq('/api/action/apply'), {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify( { "caller_idx": caller, "callee_idx": callee, } )
-    });
+    await do_req('api/action/apply', { "caller_idx": caller, "callee_idx": callee, });
 
     await read_state();
     await render();
 }
 
 async function action_eval(idx) {
-    await fetch(mkrq('/api/action/eval'), {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify( { "deck_idx": idx } )
-    });
+    await do_req('api/action/eval', { "deck_idx": idx });
 
     await read_state();
     await render();
 }
 
 async function action_bind(idx, name) {
-    await fetch(mkrq('/api/action/bind_variable'), {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify( { "bind_name": name, "deck_idx": idx, } )
-    });
+    await do_req('api/action/bind_variable', { "bind_name": name, "deck_idx": idx, });
 
     await read_state();
     await render();

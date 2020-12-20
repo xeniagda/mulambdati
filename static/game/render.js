@@ -21,15 +21,7 @@ function render_player(playerdata, left, is_you) {
             var claim_button = element_with_class_and_text("button", "", "Claim this player!");
             claim_button.onclick = async e => {
                 let name = prompt("Your name?");
-                await fetch(mkrq('/api/join_game'), {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify( { "player_idx": 1 - left, "name": name } )
-                });
+                await do_req('/api/join_game', { "player_idx": 1 - left, "name": name });
             };
             stats.appendChild(claim_button);
             stats.appendChild(element_with_class_and_text("br", "", ""));
