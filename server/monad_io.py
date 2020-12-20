@@ -100,9 +100,9 @@ async def eval_monad_io(layout, term, **kwargs):
 
         if isinstance(action, BindAction):
             # Special! y >>= x
-            y_res = await eval_monad_io(layout, args[0], **kwargs).whnf()
+            y_res = (await eval_monad_io(layout, args[0], **kwargs)).whnf()
             x_applied = Application(args[1], y_res)
-            return await eval_monad_io(layout, x_applied, **kwargs).whnf()
+            return (await eval_monad_io(layout, x_applied, **kwargs)).whnf()
 
         res = await action.run(*args, **kwargs)
         return res
