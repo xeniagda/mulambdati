@@ -213,17 +213,17 @@ class GameState:
         return {}
 
     @pl_fn(find_game=True, find_player=True, expects=["bind_name", "deck_idx"])
-    async def action_bind_variable(self, data_, i, game):
+    async def action_bind_variable(self, data, i, game):
         await game.players[i].put_action(BindVariable(data["bind_name"], data["deck_idx"]))
         return {}
 
     @pl_fn(find_game=True, find_player=True, expects=["caller_idx", "callee_idx"])
-    async def action_apply(self, data_, i, game):
+    async def action_apply(self, data, i, game):
         await game.players[i].put_action(Apply(data["caller_idx"], data["callee_idx"]))
         return {}
 
     @pl_fn(find_game=True, find_player=True, expects=["deck_idx"])
-    async def action_eval(self, data_, i, game):
+    async def action_eval(self, data, i, game):
         await game.players[i].put_action(Eval(data["deck_idx"]))
         return {}
 
