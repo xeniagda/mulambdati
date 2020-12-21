@@ -17,20 +17,9 @@ function switchMode() {
     }
 }
 
-/*
-if( document.readyState !== 'loading' ) {
-  if(document.cookie.indexOf("lightmode=1;") >= 0) {
-    switchMode()
-  }
-} else {
-  document.addEventListener("DOMContentLoaded", function(event) { 
-    if(document.cookie.indexOf("lightmode=1;") >= 0) {
-      switchMode()
-    }
-  });
+
+if(document.cookie.indexOf("lightmode=1") >= 0) {
+  switchMode()
+  console.log("Initial Switch lightmode!")
 }
-*/
-    if(document.cookie.indexOf("lightmode=1") >= 0) {
-      switchMode()
-      console.log("Initial Switch lightmode!")
-    }
+
