@@ -15,6 +15,10 @@ body {
     font-size: 15px;
 }
 
+.animate-color {
+    transition: color, background 0.3s ease-out;
+}
+
 .light-mode {
     --col-back-1: #d9dbff;
     --col-back-you: #47b94f;

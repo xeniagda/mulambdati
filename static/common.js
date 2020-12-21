@@ -19,7 +19,13 @@ function switchMode() {
 
 
 if(document.cookie.indexOf("lightmode=1") >= 0) {
-  switchMode()
-  console.log("Initial Switch lightmode!")
+    switchMode()
+    console.log("Initial Switch lightmode!")
 }
+
+// Make sure the switchMode above does not trigger the transition
+setTimeout(function () {
+    console.log("h");
+    document.body.classList.add("animate-color");
+}, 10);
 
