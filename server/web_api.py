@@ -114,28 +114,17 @@ class GameState:
         self.unclaimed_tokens = set()
         self.app = app
 
-        app.router.add_get("/", self.index)
-
-        app.router.add_post("/api/state", self.get_state)
-        app.router.add_post("/api/get_games", self.get_games)
-        app.router.add_post("/api/create_new_game", self.create_new_game)
-        app.router.add_post("/api/join_game", self.join_game)
-        app.router.add_post("/api/action/purchase_combinator", self.action_purchase_combinator)
-        app.router.add_post("/api/action/purchase_free_variable", self.action_purchase_free_variable)
-        app.router.add_post("/api/action/bind_variable", self.action_bind_variable)
-        app.router.add_post("/api/action/apply", self.action_apply)
-        app.router.add_post("/api/action/eval", self.action_eval)
-
-        app.router.add_static("/", '../static')
+        app.router.add_post("/state", self.get_state)
+        app.router.add_post("/get_games", self.get_games)
+        app.router.add_post("/create_new_game", self.create_new_game)
+        app.router.add_post("/join_game", self.join_game)
+        app.router.add_post("/action/purchase_combinator", self.action_purchase_combinator)
+        app.router.add_post("/action/purchase_free_variable", self.action_purchase_free_variable)
+        app.router.add_post("/action/bind_variable", self.action_bind_variable)
+        app.router.add_post("/action/apply", self.action_apply)
+        app.router.add_post("/action/eval", self.action_eval)
 
         self.game_futures = []
-
-    async def index(self, req):
-        return web.Response(
-            body=open("../static/lobby.html", "r").read(),
-            content_type='text/html',
-            status=200,
-        )
 
     def claim_unclaimed_token(self):
         if len(self.unclaimed_tokens) == 0:

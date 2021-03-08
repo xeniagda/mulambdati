@@ -11,12 +11,12 @@ function mkrq(path) {
 
 
 async function join_if_needed() {
-    let state = await fetch(mkrq('/api/state'), {
+    let state = await fetch(mkrq('api/state'), {
         method: 'POST',
     });
 
     if (state.status == 400) {
-        await do_req('/api/join_game');
+        await do_req('api/join_game');
     }
 }
 

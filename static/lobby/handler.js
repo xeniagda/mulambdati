@@ -1,7 +1,7 @@
 var created_games = new Set();
 
 async function load_and_render_games() {
-    let games = await fetch('/api/get_games', { "method": "POST" });
+    let games = await fetch('api/get_games', { "method": "POST" });
     let data = await games.json();
 
     var lobby = document.getElementById("lobby");
@@ -14,7 +14,7 @@ async function load_and_render_games() {
 }
 
 document.getElementById("create-new-game").onclick = async e => {
-    let created = await fetch('/api/create_new_game', { "method": "POST" });
+    let created = await fetch('api/create_new_game', { "method": "POST" });
     let data = await created.json();
     created_games.add(data["created_id"]);
 
