@@ -114,15 +114,15 @@ class GameState:
         self.unclaimed_tokens = set()
         self.app = app
 
-        app.router.add_post("/mulambdati/api/state", self.get_state)
-        app.router.add_post("/mulambdati/api/get_games", self.get_games)
-        app.router.add_post("/mulambdati/api/create_new_game", self.create_new_game)
-        app.router.add_post("/mulambdati/api/join_game", self.join_game)
-        app.router.add_post("/mulambdati/api/action/purchase_combinator", self.action_purchase_combinator)
-        app.router.add_post("/mulambdati/api/action/purchase_free_variable", self.action_purchase_free_variable)
-        app.router.add_post("/mulambdati/api/action/bind_variable", self.action_bind_variable)
-        app.router.add_post("/mulambdati/api/action/apply", self.action_apply)
-        app.router.add_post("/mulambdati/api/action/eval", self.action_eval)
+        app.router.add_post("/state", self.get_state)
+        app.router.add_post("/get_games", self.get_games)
+        app.router.add_post("/create_new_game", self.create_new_game)
+        app.router.add_post("/join_game", self.join_game)
+        app.router.add_post("/action/purchase_combinator", self.action_purchase_combinator)
+        app.router.add_post("/action/purchase_free_variable", self.action_purchase_free_variable)
+        app.router.add_post("/action/bind_variable", self.action_bind_variable)
+        app.router.add_post("/action/apply", self.action_apply)
+        app.router.add_post("/action/eval", self.action_eval)
 
         self.game_futures = []
 
